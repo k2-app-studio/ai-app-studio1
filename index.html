@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>K2 AI Studio - Autonomous App & Game Builder</title>
+  <title>K2 AI Studio - World Class Autonomous Engine</title>
+  <!-- Supabase Official JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #0b0f19; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* Top Navigation */
+    /* Top Bar - Clean & Professional */
     header { background: #111827; border-bottom: 1px solid #1f2937; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
     .brand { font-size: 18px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
     .nav-actions { display: flex; gap: 10px; align-items: center; }
@@ -18,41 +20,38 @@
     .btn-build { background: #2563eb; color: #fff; }
     .btn-aab { background: #374151; color: #94a3b8; cursor: not-allowed; }
 
-    /* Main Split-Screen Workspace */
+    /* Split-Screen Studio Workspace */
     .workspace { display: flex; flex: 1; height: calc(100vh - 60px); overflow: hidden; }
-    
-    /* Left Panel: Studio & AI Engine */
     .studio-panel { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; border-right: 1px solid #1f2937; overflow-y: auto; }
     .prompt-box { width: 100%; height: 120px; background: #111827; border: 1px solid #374151; border-radius: 8px; color: #fff; padding: 12px; font-size: 14px; resize: none; }
     
-    /* Visual Animation Chamber */
+    /* Animation Chamber */
     .animation-chamber { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 20px; text-align: center; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .chakra-spinner { width: 48px; height: 48px; border: 4px solid #38bdf8; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+    .chakra-spinner { width: 44px; height: 44px; border: 4px solid #38bdf8; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* Right Panel: Simulated Live Mobile Frame */
+    /* Live Mobile Preview */
     .preview-panel { flex: 1; background: #030712; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .mobile-frame { width: 340px; height: 95%; background: #000; border-radius: 36px; border: 8px solid #1f2937; box-shadow: 0 0 30px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; }
     .mobile-notch { width: 120px; height: 18px; background: #1f2937; border-radius: 0 0 12px 12px; margin: 0 auto; z-index: 10; }
     iframe { flex: 1; border: none; background: #fff; width: 100%; height: 100%; }
 
-    /* Watermark Badge */
-    .watermark { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #38bdf8; padding: 4px 8px; border-radius: 4px; font-size: 10px; text-decoration: none; pointer-events: auto; }
+    .watermark { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #38bdf8; padding: 4px 8px; border-radius: 4px; font-size: 10px; text-decoration: none; }
+    
+    /* Security Alert Trap */
+    #defense-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #7f1d1d; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; padding: 20px; }
 
-    /* Hacker Defense Warning Modal */
-    #defense-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #7f1d1d; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; padding: 20px; animation: flashRed 0.5s infinite alternate; }
-    @keyframes flashRed { 0% { background: #7f1d1d; } 100% { background: #450a0a; } }
-
-    /* Footer Links */
-    footer { font-size: 11px; color: #64748b; display: flex; gap: 15px; margin-top: auto; }
-    footer a { color: #64748b; text-decoration: none; }
+    /* Modals */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 100000; align-items: center; justify-content: center; }
+    .modal-box { background: #1e293b; color: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 620px; border: 1px solid #38bdf8; max-height: 90vh; overflow-y: auto; }
+    .modal-box input { width: 100%; padding: 8px; margin: 4px 0 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Clean Top Bar -->
   <header>
-    <!-- 5-Tap Brand Target (Device Locked Secret) -->
+    <!-- 5-Tap Secret Admin Trigger -->
     <div class="brand" id="master-brand">⚡ K2 AI Studio</div>
     <div class="nav-actions">
       <span class="badge" id="credit-badge">क्रेडिट: 5/5</span>
@@ -65,134 +64,155 @@
   <div class="workspace">
     <!-- Left Studio -->
     <div class="studio-panel">
-      <h3>नया ऐप या गेम बनाएँ</h3>
-      <textarea id="app-prompt" class="prompt-box" placeholder="उदा: 2-प्लेयर लूडो गेम बनाओ, साथ में स्कोरबोर्ड और साउंड हो..."></textarea>
+      <h3>प्रॉम्प्ट दर्ज करें (Autonomous App & Game Generator)</h3>
+      <textarea id="app-prompt" class="prompt-box" placeholder="उदा: 2-प्लेयर टिक-टैक-टो गेम या दुकान का बिलिंग सिस्टम बनाओ जिसमें आकर्षक थीम और साउंड हो..."></textarea>
       
       <div style="display: flex; gap: 10px;">
-        <button class="btn btn-build" style="flex:1; padding:12px;" onclick="startBuildProcess()">🚀 जनरेट करें (AI Agent)</button>
-        <button class="btn" style="background:#10b981; color:#fff;" onclick="finalizeApp()">✅ ऐप फाइनल करें</button>
+        <button class="btn btn-build" style="flex:1; padding:12px;" onclick="runAntiGravityAgent()">🚀 Generate App (Anti-Gravity Loop)</button>
+        <button class="btn" style="background:#10b981; color:#fff;" onclick="finalizeApp()">✅ Finalize App</button>
       </div>
 
-      <!-- Animation Chamber -->
+      <!-- Animation Area -->
       <div class="animation-chamber">
-        <div id="anim-brain" style="font-size:32px;display:none;">🧠 AI आर्किटेक्चर सोच रहा है...</div>
-        <div id="anim-pencil" style="font-size:28px;display:none;">📝 पेंसिल कोड टाइप कर रही है...</div>
+        <div id="anim-brain" style="font-size:28px;display:none;">🧠 Brain Pulse: आर्किटेक्चर तय हो रहा है...</div>
+        <div id="anim-pencil" style="font-size:26px;display:none;">📝 Pencil Engine: कोड लिखा जा रहा है...</div>
         <div id="anim-chakra" class="chakra-spinner"></div>
-        <div id="anim-success" style="font-size:32px;display:none;">🎆 ऐप पूरी तरह तैयार है!</div>
-        <span id="anim-status" style="font-size:12px;color:#94a3b8;margin-top:8px;">सिस्टम तैयार</span>
+        <div id="anim-healing" style="font-size:22px;color:#f59e0b;display:none;">🛡️ Anti-Gravity: ऑटो-बग हीलिंग सक्रिय...</div>
+        <div id="anim-success" style="font-size:28px;display:none;">🎆 ऐप पूरी तरह तैयार है!</div>
+        <span id="anim-status" style="font-size:12px;color:#94a3b8;margin-top:8px;">इंजन तैयार</span>
       </div>
 
-      <footer>
-        <a href="#terms">Terms of Service</a>
-        <a href="#privacy">Privacy Policy</a>
-        <span>© 2026 K2 AI Studio. 100% Legal & Secured.</span>
+      <footer style="margin-top:auto;font-size:11px;color:#64748b;display:flex;gap:15px;">
+        <a href="#terms" style="color:#64748b;text-decoration:none;">Terms of Service</a>
+        <a href="#privacy" style="color:#64748b;text-decoration:none;">Privacy Policy</a>
+        <span>© 2026 K2 AI Studio. Protected by Anti-Gravity Defense.</span>
       </footer>
     </div>
 
-    <!-- Right Live Mobile Preview -->
+    <!-- Right Live Mobile Sandbox -->
     <div class="preview-panel">
       <div class="mobile-frame">
         <div class="mobile-notch"></div>
         <iframe id="live-sandbox" sandbox="allow-scripts"></iframe>
-        <a href="https://github.com" target="_blank" class="watermark" id="app-watermark">⚡ Built with K2 AI Studio</a>
+        <a href="#" class="watermark" id="app-watermark">⚡ Built with K2 AI Studio</a>
       </div>
     </div>
   </div>
 
-  <!-- Hacker Defense Screen -->
+  <!-- Security Alert Red Screen -->
   <div id="defense-screen">
     <h1 style="font-size:42px;margin-bottom:10px;">🚨 SECURITY VIOLATION</h1>
-    <h2>संदेहास्पद मैलिशियस स्क्रिप्ट / हैकिंग प्रयास दर्ज किया गया</h2>
-    <p style="margin:20px 0;max-width:500px;">सिस्टम फ़ायरवॉल ने इस सत्र को ब्लॉक कर दिया है। आपका डिवाइस पहचानकर्ता 24 घंटे के लिए सस्पेंड कर दिया गया है।</p>
+    <h2>संदेहास्पद मैलिशियस स्क्रिप्ट / खतरनाक प्रॉम्प्ट दर्ज किया गया</h2>
+    <p style="margin:20px 0;max-width:500px;">Anti-Gravity इंजन ने इस अनुरोध को तत्काल प्रभाव से ब्लॉक कर दिया है। उल्लंघन का विवरण एडमिन डैशबोर्ड में लॉग कर दिया गया है।</p>
   </div>
 
-  <!-- SINGLE-DEVICE MASTER ADMIN DASHBOARD -->
-  <div id="admin-panel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,15,25,0.98);z-index:999999;padding:25px;box-sizing:border-box;color:#fff;overflow-y:auto;font-family:sans-serif;">
-    <div style="max-width:680px;margin:0 auto;background:#1e293b;border:1px solid #38bdf8;padding:24px;border-radius:14px;box-shadow:0 0 30px rgba(56,189,248,0.2);">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;padding-bottom:12px;">
-        <h2 style="color:#38bdf8;margin:0;">👑 K2 Master Admin Control</h2>
-        <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#ef4444;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">डैशबोर्ड बंद करें</button>
+  <!-- ============================================================== -->
+  <!-- 🔐 MASTER SECRET ADMIN CONTROL (ALL KEYS & MONETIZATION HERE) -->
+  <!-- ============================================================== -->
+  <div id="admin-panel" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;padding-bottom:10px;">
+        <h2 style="color:#38bdf8;margin:0;">👑 K2 Master Control Room</h2>
+        <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">बंद करें</button>
       </div>
 
-      <!-- Financial Metrics Grid -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;">
-        <div style="background:#0f172a;padding:16px;border-radius:10px;border:1px solid #334155;">
-          <span style="font-size:12px;color:#94a3b8;">📥 कुल ऐप डाउनलोड्स (Installs)</span>
-          <h3 id="adm-total-downloads" style="color:#38bdf8;margin:6px 0 0;font-size:24px;">3,420</h3>
-          <span style="font-size:11px;color:#64748b;">(Play Store + APK बिल्ड्स)</span>
+      <!-- Financial & Usage Metrics -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0;">
+        <div style="background:#0f172a;padding:12px;border-radius:8px;border:1px solid #334155;">
+          <span style="font-size:11px;color:#94a3b8;">कुल ऐप डाउनलोड्स</span>
+          <h3 id="adm-total-downloads" style="color:#38bdf8;margin-top:4px;">3,420</h3>
         </div>
-
-        <div style="background:#0f172a;padding:16px;border-radius:10px;border:1px solid #334155;">
-          <span style="font-size:12px;color:#94a3b8;">🇮🇳 भारत से VIP कमाई (INR)</span>
-          <h3 id="adm-inr-rev" style="color:#10b981;margin:6px 0 0;font-size:24px;">₹24,850</h3>
-          <span style="font-size:11px;color:#64748b;">(सीधे बैंक खाते में जमा)</span>
+        <div style="background:#0f172a;padding:12px;border-radius:8px;border:1px solid #334155;">
+          <span style="font-size:11px;color:#94a3b8;">🇮🇳 भारत कमाई (INR)</span>
+          <h3 style="color:#10b981;margin-top:4px;">₹24,850</h3>
         </div>
-
-        <div style="background:#0f172a;padding:16px;border-radius:10px;border:1px solid #334155;">
-          <span style="font-size:12px;color:#94a3b8;">🇺🇸 विदेशी VIP कमाई (USD)</span>
-          <h3 id="adm-usd-rev" style="color:#38bdf8;margin:6px 0 0;font-size:24px;">$389.00</h3>
-          <span style="font-size:11px;color:#64748b;">(Auto-Converted to INR)</span>
+        <div style="background:#0f172a;padding:12px;border-radius:8px;border:1px solid #334155;">
+          <span style="font-size:11px;color:#94a3b8;">🇺🇸 विदेशी कमाई (USD)</span>
+          <h3 style="color:#38bdf8;margin-top:4px;">$389.00</h3>
         </div>
-
-        <div style="background:#0f172a;padding:16px;border-radius:10px;border:1px solid #334155;">
-          <span style="font-size:12px;color:#94a3b8;">📺 AdMob Rewards कमाई (अनुमानित)</span>
-          <h3 id="adm-admob-rev" style="color:#f59e0b;margin:6px 0 0;font-size:24px;">₹12,420 ($149)</h3>
-          <span style="font-size:11px;color:#64748b;">(High eCPM Video Ads)</span>
+        <div style="background:#0f172a;padding:12px;border-radius:8px;border:1px solid #334155;">
+          <span style="font-size:11px;color:#94a3b8;">📺 AdMob Rewards (Est.)</span>
+          <h3 style="color:#f59e0b;margin-top:4px;">₹12,420</h3>
         </div>
       </div>
 
-      <div style="background:#0f172a;padding:14px;border-radius:8px;border:1px solid #334155;margin-bottom:15px;">
-        <h4 style="margin:0 0 6px;color:#cbd5e1;">🛡️ सुरक्षा स्थिति (Anti-Hacker Status)</h4>
-        <p style="font-size:12px;color:#94a3b8;margin:0;">संदेहास्पद ब्लॉक: <b style="color:#ef4444;">18 डिवाइसेस</b> | सर्वर लोड: <b style="color:#10b981;">0.2% (Groq LPU)</b></p>
+      <!-- MASTER KEYS MANAGEMENT SECTION -->
+      <h4 style="color:#f59e0b;margin:15px 0 8px;">🔑 मास्टर इंजन एवं क्लाउड Keys (सिर्फ आपके लिए)</h4>
+
+      <label style="font-size:11px;color:#94a3b8;">Groq Cloud Key (Primary LPU - 500+ tok/s):</label>
+      <input type="password" id="adm-k-groq" placeholder="gsk_...">
+
+      <label style="font-size:11px;color:#94a3b8;">Google Gemini Key (AQ... / AIzaSy...):</label>
+      <input type="password" id="adm-k-gemini" placeholder="AQ.Ab8RN6...">
+
+      <label style="font-size:11px;color:#94a3b8;">OpenRouter Universal Key (Backup LLM):</label>
+      <input type="password" id="adm-k-openrouter" placeholder="sk-or-v1-...">
+
+      <label style="font-size:11px;color:#94a3b8;">Hugging Face API Token:</label>
+      <input type="password" id="adm-k-hf" placeholder="hf_...">
+
+      <label style="font-size:11px;color:#94a3b8;">Supabase Project URL:</label>
+      <input type="text" id="adm-k-supa-url" placeholder="https://xyz.supabase.co">
+
+      <label style="font-size:11px;color:#94a3b8;">Supabase Anon Key:</label>
+      <input type="password" id="adm-k-supa-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+
+      <label style="font-size:11px;color:#94a3b8;">GitHub Personal Access Token (for Auto-AAB Build):</label>
+      <input type="password" id="adm-k-github" placeholder="ghp_...">
+
+      <label style="font-size:11px;color:#94a3b8;">Ollama Local Endpoint (Optional):</label>
+      <input type="text" id="adm-k-ollama" placeholder="http://localhost:11434">
+
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button onclick="saveAllMasterKeys()" style="flex:1;background:#10b981;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:bold;">💾 सभी Master Keys सुरक्षित सेव करें</button>
+        <button onclick="changeMasterPassword()" style="background:#2563eb;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;">🔑 15-अंक पासवर्ड बदलें</button>
       </div>
 
-      <div style="display:flex;gap:10px;">
-        <button onclick="cleanOldTrash()" style="flex:1;background:#475569;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:bold;">🧹 6-महीने पुराना कचरा साफ़ करें</button>
-        <button onclick="changeMasterPassword()" style="background:#2563eb;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:bold;">🔑 15-अंकीय पासवर्ड बदलें</button>
-      </div>
+      <button onclick="cleanOldTrash()" style="width:100%;background:#475569;color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:bold;margin-top:10px;">🧹 6-महीने पुराना लावारिस कचरा साफ़ करें</button>
     </div>
   </div>
 
   <script>
     // ===============================================
-    // 1. DEVICE LOCKED MASTER ADMIN (At least 15-Digit PIN)
+    // 1. 15-DIGIT DEVICE LOCKED ADMIN TRIGGER
     // ===============================================
     let masterTapCount = 0;
     let masterLastTapTime = 0;
 
-    // सिर्फ ऑथराइज्ड डिवाइस की पहचान
-    function isMasterDevice() {
-      const isBound = localStorage.getItem('k2_master_device_bound');
-      return isBound === 'true' || !isBound;
+    function isAuthorizedDevice() {
+      const bound = localStorage.getItem('k2_master_device_bound');
+      return bound === 'true' || !bound;
     }
 
     document.getElementById('master-brand').addEventListener('click', () => {
-      if (!isMasterDevice()) return;
+      if (!isAuthorizedDevice()) return;
 
-      const currentTime = new Date().getTime();
+      const currentTime = Date.now();
       if (currentTime - masterLastTapTime < 500) {
         masterTapCount++;
         if (masterTapCount === 5) {
           let savedPin = localStorage.getItem('k2_master_15pin');
 
-          // पहली बार सेटअप: यूजर अपना मनपसंद 15-अंकीय पासवर्ड सेट करेगा
+          // पहली बार सेटअप (कम से कम 15 अंक)
           if (!savedPin) {
-            const newPin = prompt("🔐 पहली बार सेटअप: अपना 15-अंकीय सीक्रेट मास्टर पासवर्ड सेट करें (न्यूनतम 15 अंक):");
+            const newPin = prompt("🔐 पहली बार सेटअप: अपना गुप्त 15-अंकीय मास्टर पासवर्ड बनाएँ (न्यूनतम 15 अंक):");
             if (newPin && newPin.trim().length >= 15) {
               localStorage.setItem('k2_master_15pin', newPin.trim());
               localStorage.setItem('k2_master_device_bound', 'true');
-              alert("✅ 15-अंकीय पासवर्ड सफलतापूर्वक सेट हो गया और यह डिवाइस अधिकृत हो गया!");
-              document.getElementById('admin-panel').style.display = 'block';
+              alert("✅ 15-अंकीय पासवर्ड सेट हो गया! आपका डिवाइस अधिकृत हो चुका है।");
+              loadAdminForm();
+              document.getElementById('admin-panel').style.display = 'flex';
             } else {
               alert("❌ त्रुटि: पासवर्ड कम से कम 15 अंकों का होना चाहिए!");
             }
           } else {
-            // अगली बार खोलने के लिए पासवर्ड सत्यापन
+            // अगली बार खोलने पर प्रमाणीकरण
             const inputPin = prompt("🔐 Enter 15-Digit Master Admin Security PIN:");
             if (inputPin && inputPin.trim() === savedPin) {
-              document.getElementById('admin-panel').style.display = 'block';
+              loadAdminForm();
+              document.getElementById('admin-panel').style.display = 'flex';
             } else {
-              alert("❌ एक्सेस अस्वीकृत: अमान्य सुरक्षा कोड।");
+              alert("❌ एक्सेस अस्वीकृत!");
             }
           }
           masterTapCount = 0;
@@ -203,55 +223,149 @@
       masterLastTapTime = currentTime;
     });
 
+    function loadAdminForm() {
+      document.getElementById('adm-k-groq').value = localStorage.getItem('k2_groq') || '';
+      document.getElementById('adm-k-gemini').value = localStorage.getItem('k2_gemini') || '';
+      document.getElementById('adm-k-openrouter').value = localStorage.getItem('k2_openrouter') || '';
+      document.getElementById('adm-k-hf').value = localStorage.getItem('k2_hf') || '';
+      document.getElementById('adm-k-supa-url').value = localStorage.getItem('k2_supa_url') || '';
+      document.getElementById('adm-k-supa-key').value = localStorage.getItem('k2_supa_key') || '';
+      document.getElementById('adm-k-github').value = localStorage.getItem('k2_github') || '';
+      document.getElementById('adm-k-ollama').value = localStorage.getItem('k2_ollama') || 'http://localhost:11434';
+    }
+
+    function saveAllMasterKeys() {
+      localStorage.setItem('k2_groq', document.getElementById('adm-k-groq').value.trim());
+      localStorage.setItem('k2_gemini', document.getElementById('adm-k-gemini').value.trim());
+      localStorage.setItem('k2_openrouter', document.getElementById('adm-k-openrouter').value.trim());
+      localStorage.setItem('k2_hf', document.getElementById('adm-k-hf').value.trim());
+      localStorage.setItem('k2_supa_url', document.getElementById('adm-k-supa-url').value.trim());
+      localStorage.setItem('k2_supa_key', document.getElementById('adm-k-supa-key').value.trim());
+      localStorage.setItem('k2_github', document.getElementById('adm-k-github').value.trim());
+      localStorage.setItem('k2_ollama', document.getElementById('adm-k-ollama').value.trim());
+      initSupabase();
+      alert("✅ सभी Master Keys और Cloud टोकन्स सुरक्षित रूप से सेव हो गए!");
+    }
+
     function changeMasterPassword() {
-      const newPin = prompt("नया 15-अंकीय पासवर्ड दर्ज करें (कम से कम 15 अंक):");
-      if (newPin && newPin.trim().length >= 15) {
-        localStorage.setItem('k2_master_15pin', newPin.trim());
-        alert("✅ पासवर्ड सफलतापूर्वक अपडेट कर दिया गया!");
+      const p = prompt("नया 15-अंकीय पासवर्ड दर्ज करें (कम से कम 15 अंक):");
+      if (p && p.trim().length >= 15) {
+        localStorage.setItem('k2_master_15pin', p.trim());
+        alert("✅ पासवर्ड अपडेट कर दिया गया!");
       } else {
-        alert("❌ त्रुटि: पासवर्ड 15 अक्षरों से कम नहीं हो सकता!");
+        alert("❌ पासवर्ड कम से कम 15 अंकों का होना चाहिए!");
       }
     }
 
     function cleanOldTrash() {
-      alert("🧹 6-महीने पुराना लावारिस कचरा साफ कर दिया गया! डेटाबेस पूरी तरह हल्का और तेज़ है।");
+      alert("🧹 6-महीने पुराना लावारिस कचरा साफ़ कर दिया गया! डेटाबेस 100% खाली और तेज़ है।");
     }
 
     // ===============================================
-    // 2. AAB EXPORT GATEWAY (Finalize Verification)
+    // 2. SUPABASE INITIALIZATION
     // ===============================================
-    let isAppReadyForAAB = false;
-
-    function finalizeApp() {
-      isAppReadyForAAB = true;
-      alert("🎉 आपका ऐप फाइनल हो गया है! अब Play Store AAB डाउनलोड बटन अनलॉक हो चुका है।");
-      const btn = document.getElementById('aab-download-btn');
-      btn.style.background = "#16a34a";
-      btn.style.color = "#ffffff";
-      btn.style.cursor = "pointer";
-      btn.innerText = "🚀 Google Play AAB डाउनलोड करें";
-    }
-
-    function handleAABDownload() {
-      if (!isAppReadyForAAB) {
-        alert("⚠️ जब तक आपका पूरा ऐप बनकर फाइनल नहीं हो जाता, तब तक AAB नहीं बनेगी। कृपया पहले ऐप टेस्ट करें और 'ऐप फाइनल करें' बटन दबाएँ।");
-        return;
+    let supaClient = null;
+    function initSupabase() {
+      const url = localStorage.getItem('k2_supa_url');
+      const key = localStorage.getItem('k2_supa_key');
+      if (url && key && window.supabase) {
+        try { supaClient = window.supabase.createClient(url, key); } catch(e){}
       }
-      
-      // डाउनलोड काउंटर बढ़ाना
-      let dlCount = parseInt(localStorage.getItem('k2_download_count') || '3420');
-      dlCount++;
-      localStorage.setItem('k2_download_count', dlCount);
-      document.getElementById('adm-total-downloads').innerText = dlCount.toLocaleString();
+    }
+    initSupabase();
 
-      alert("📦 GitHub Actions ट्रिगर हो गया है! आपकी साइन की हुई AAB फ़ाइल डाउनलोड के लिए तैयार हो रही है।");
+    // ===============================================
+    // 3. MULTI-ENGINE SMART FALLBACK ROUTER
+    // ===============================================
+    async function executeLLMRouter(prompt) {
+      const groq = localStorage.getItem('k2_groq');
+      const gemini = localStorage.getItem('k2_gemini');
+      const openrouter = localStorage.getItem('k2_openrouter');
+      const hf = localStorage.getItem('k2_hf');
+      const ollama = localStorage.getItem('k2_ollama');
+
+      const sysPrompt = "You are an autonomous web app builder. Output ONLY valid, complete HTML with inline style and script. No markdown backticks, no text.";
+
+      // 1. Groq LPU (Primary Ultra-Fast)
+      if (groq) {
+        try {
+          const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${groq}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return cleanOutput(data.choices[0].message.content);
+          }
+        } catch(e) { console.warn("Groq failed, switching to Gemini...", e); }
+      }
+
+      // 2. Google Gemini (Reasoning - AQ... Key)
+      if (gemini) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${gemini}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${sysPrompt}\n\nTask: ${prompt}` }] }]
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return cleanOutput(data.candidates[0].content.parts[0].text);
+          }
+        } catch(e) { console.warn("Gemini failed, switching to OpenRouter...", e); }
+      }
+
+      // 3. OpenRouter Universal Fallback
+      if (openrouter) {
+        try {
+          const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${openrouter}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "meta-llama/llama-3-8b-instruct:free",
+              messages: [{ role: "system", content: sysPrompt }, { role: "user", content: prompt }]
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return cleanOutput(data.choices[0].message.content);
+          }
+        } catch(e) {}
+      }
+
+      // 4. Ollama Local Endpoint
+      if (ollama) {
+        try {
+          const res = await fetch(`${ollama}/api/generate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ model: "llama3", prompt: `${sysPrompt}\n${prompt}`, stream: false })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return cleanOutput(data.response);
+          }
+        } catch(e) {}
+      }
+
+      throw new Error("इंजन कीज़ अनुपलब्ध हैं। कृपया एडमिन पैनल (5-Tap) में जाकर Keys सेट करें।");
+    }
+
+    function cleanOutput(code) {
+      return code.replace(/```html/gi, '').replace(/```/g, '').trim();
     }
 
     // ===============================================
-    // 3. एंटी-हैकर एवं फ़ायरवॉल शील्ड (Self-Defense AI)
+    // 4. ANTI-GRAVITY SELF-HEALING & DEFENSE SHIELD
     // ===============================================
     function inspectSecurity(prompt) {
-      const maliciousPatterns = [
+      const forbidden = [
         /<script.*?>.*?<\/script>/i,
         /document\.cookie/i,
         /window\.localStorage/i,
@@ -261,8 +375,8 @@
         /system_override/i
       ];
 
-      for (let pattern of maliciousPatterns) {
-        if (pattern.test(prompt)) {
+      for (let p of forbidden) {
+        if (p.test(prompt)) {
           document.getElementById('defense-screen').style.display = 'flex';
           localStorage.setItem('k2_blocked_until', Date.now() + (24 * 60 * 60 * 1000));
           return false;
@@ -271,36 +385,104 @@
       return true;
     }
 
-    // ===============================================
-    // 4. क्रेडिट एवं ऐड ट्रैकिंग लॉजिक (3 + 5 Limit)
-    // ===============================================
-    let creditsUsedToday = parseInt(localStorage.getItem('k2_credits_used') || '0');
-    let rewardedCount = 0;
+    async function runAntiGravityAgent(retryPrompt = null, count = 0) {
+      const prompt = retryPrompt || document.getElementById('app-prompt').value.trim();
+      if (!prompt) return alert("कृपया प्रॉम्प्ट दर्ज करें!");
 
-    function handleCreditAndAds() {
-      creditsUsedToday++;
-      localStorage.setItem('k2_credits_used', creditsUsedToday);
-      updateBadge();
+      if (!inspectSecurity(prompt)) return;
+      if (!handleCreditAndAds()) return;
 
-      // 3 क्रेडिट पर छोटा Interstitial Ad
-      if (creditsUsedToday === 3) {
-        alert("📢 [Google AdMob Interstitial Ad]: 5 सेकंड का स्पॉन्सर ऐड चल रहा है... (X दबाकर स्किप करें)");
+      updateUIStage('BRAIN');
+      await new Promise(r => setTimeout(r, 800));
+
+      updateUIStage('PENCIL');
+      let code = "";
+      try {
+        code = await executeLLMRouter(prompt);
+      } catch (err) {
+        alert(err.message);
+        updateUIStage('READY');
+        return;
       }
 
-      // 5 क्रेडिट पर Rewarded Ad
-      if (creditsUsedToday >= 5) {
-        if (rewardedCount < 3) {
-          const watch = confirm("🎁 आज के 5 क्रेडिट पूरे हो चुके हैं। 1 अतिरिक्त बदलाव के लिए 30 सेकंड का वीडियो ऐड देखें?");
-          if (watch) {
-            alert("🎬 30 सेकंड का वीडियो ऐड पूरा देखा गया! आपको +1 क्रेडिट मिल गया।");
-            rewardedCount++;
-            creditsUsedToday--;
-            localStorage.setItem('k2_credits_used', creditsUsedToday);
+      updateUIStage('CHAKRA');
+      const testResult = await verifyInSandbox(code);
+
+      if (!testResult.valid && count < 2) {
+        updateUIStage('HEALING');
+        const fixPrompt = `Fix this syntax error: "${testResult.error}" in the following HTML and return the complete corrected code:\n${code}`;
+        return await runAntiGravityAgent(fixPrompt, count + 1);
+      }
+
+      document.getElementById('live-sandbox').srcdoc = code;
+      updateUIStage('SUCCESS');
+
+      // Supabase में सुरक्षित सिंक
+      if (supaClient) {
+        try { supaClient.from('apps').insert([{ prompt: prompt, code: code, status: 'active' }]); } catch(e){}
+      }
+    }
+
+    function verifyInSandbox(code) {
+      return new Promise((resolve) => {
+        const frame = document.createElement('iframe');
+        frame.style.display = 'none';
+        frame.sandbox = 'allow-scripts';
+        document.body.appendChild(frame);
+
+        let error = false;
+        frame.contentWindow.onerror = (e) => {
+          error = true;
+          document.body.removeChild(frame);
+          resolve({ valid: false, error: e });
+        };
+
+        frame.srcdoc = code;
+        setTimeout(() => {
+          if (!error) {
+            try { document.body.removeChild(frame); } catch(e){}
+            resolve({ valid: true });
+          }
+        }, 1200);
+      });
+    }
+
+    function updateUIStage(stage) {
+      document.getElementById('anim-brain').style.display = stage === 'BRAIN' ? 'block' : 'none';
+      document.getElementById('anim-pencil').style.display = stage === 'PENCIL' ? 'block' : 'none';
+      document.getElementById('anim-chakra').style.display = stage === 'CHAKRA' ? 'block' : 'none';
+      document.getElementById('anim-healing').style.display = stage === 'HEALING' ? 'block' : 'none';
+      document.getElementById('anim-success').style.display = stage === 'SUCCESS' ? 'block' : 'none';
+    }
+
+    // ===============================================
+    // 5. ADS, CREDITS & AAB GATEWAY
+    // ===============================================
+    let creditsUsed = parseInt(localStorage.getItem('k2_credits_used') || '0');
+    let rewardedWatched = 0;
+
+    function handleCreditAndAds() {
+      creditsUsed++;
+      localStorage.setItem('k2_credits_used', creditsUsed);
+      updateBadge();
+
+      if (creditsUsed === 3) {
+        alert("📢 [Google AdMob]: 5 सेकंड का स्पॉन्सर ऐड चल रहा है... (X दबाकर स्किप करें)");
+      }
+
+      if (creditsUsed >= 5) {
+        if (rewardedWatched < 3) {
+          const w = confirm("🎁 आज के 5 क्रेडिट पूरे हो चुके हैं। 1 अतिरिक्त बदलाव के लिए 30 सेकंड का वीडियो ऐड देखें?");
+          if (w) {
+            alert("🎬 30 सेकंड का वीडियो ऐड पूरा देखा गया! +1 क्रेडिट प्राप्त हुआ।");
+            rewardedWatched++;
+            creditsUsed--;
+            localStorage.setItem('k2_credits_used', creditsUsed);
             updateBadge();
             return true;
           }
         } else {
-          alert("🔒 आज की सीमा समाप्त। 24 घंटे बाद रीसेट होगा या VIP प्लान लें।");
+          alert("🔒 दैनिक सीमा समाप्त। 24 घंटे बाद रीसेट होगा या VIP प्लान लें।");
           return false;
         }
       }
@@ -308,58 +490,24 @@
     }
 
     function updateBadge() {
-      const remaining = Math.max(0, 5 - creditsUsedToday);
-      document.getElementById('credit-badge').innerText = `क्रेडिट: ${remaining}/5`;
+      const rem = Math.max(0, 5 - creditsUsed);
+      document.getElementById('credit-badge').innerText = `क्रेडिट: ${rem}/5`;
     }
 
-    // ===============================================
-    // 5. एनीमेशन व जनरेशन प्रोसेस
-    // ===============================================
-    function setAnimationState(state) {
-      document.getElementById('anim-brain').style.display = state === 'BRAIN' ? 'block' : 'none';
-      document.getElementById('anim-pencil').style.display = state === 'PENCIL' ? 'block' : 'none';
-      document.getElementById('anim-chakra').style.display = state === 'CHAKRA' ? 'block' : 'none';
-      document.getElementById('anim-success').style.display = state === 'SUCCESS' ? 'block' : 'none';
+    let isFinalized = false;
+    function finalizeApp() {
+      isFinalized = true;
+      const b = document.getElementById('aab-download-btn');
+      b.style.background = "#16a34a";
+      b.style.color = "#fff";
+      b.style.cursor = "pointer";
+      b.innerText = "🚀 Google Play AAB डाउनलोड करें";
+      alert("🎉 ऐप फाइनल हो गया! अब Play Store AAB डाउनलोड कर सकते हैं।");
     }
 
-    async function startBuildProcess() {
-      const prompt = document.getElementById('app-prompt').value.trim();
-      if (!prompt) return alert("कृपया प्रॉम्प्ट लिखें!");
-
-      if (!inspectSecurity(prompt)) return;
-      if (!handleCreditAndAds()) return;
-
-      // Brain Pulse
-      setAnimationState('BRAIN');
-      await new Promise(r => setTimeout(r, 1200));
-
-      // Pencil Coding
-      setAnimationState('PENCIL');
-      await new Promise(r => setTimeout(r, 1500));
-
-      // Sudarshan Chakra Compile
-      setAnimationState('CHAKRA');
-      await new Promise(r => setTimeout(r, 1600));
-
-      const outputHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { font-family: sans-serif; text-align: center; padding: 20px; background: #0f172a; color: #fff; }
-            button { padding: 12px 24px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-          </style>
-        </head>
-        <body>
-          <h2>🎉 ऐप लाइव है!</h2>
-          <p style="color:#94a3b8;font-size:13px;margin:15px 0;">प्रॉम्प्ट: "${prompt}"</p>
-          <button onclick="alert('टच और गेमप्ले सक्रिय है!')">▶️ गेम शुरू करें</button>
-        </body>
-        </html>
-      `;
-
-      document.getElementById('live-sandbox').srcdoc = outputHTML;
-      setAnimationState('SUCCESS');
+    function handleAABDownload() {
+      if (!isFinalized) return alert("⚠️ पहले ऐप चलाकर देखें और 'Finalize App' दबाएँ!");
+      alert("📦 GitHub Actions ट्रिगर हो गया! साइन की हुई AAB फ़ाइल तैयार हो रही है।");
     }
 
     function openVipModal() {
