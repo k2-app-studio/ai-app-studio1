@@ -23,16 +23,24 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - name: Build Web & Capacitor Android
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Initialize Web App & Capacitor Android
         run: |
+          mkdir -p www
+          cp index.html www/
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "K2 AI Studio" "com.k2.aistudio" --web-dir .
+          npx cap init "K2 AI Studio" "com.k2.aistudio" --web-dir www
           npx cap add android
           npx cap sync android
+
+      - name: Build APK via Gradle
+        run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload Test APK
         uses: actions/upload-artifact@v4
