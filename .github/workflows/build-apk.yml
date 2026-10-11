@@ -1,4 +1,4 @@
-name: Build Android APK and AAB
+name: Build Android APK Only
 
 on:
   push:
@@ -9,38 +9,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install Dependencies & Setup Android
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Build Web & Capacitor Android
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "K2 AI Studio" "com.k2.aistudio" --web-dir .
           npx cap add android
-
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: 17
-
-      - name: Compile Release Builds (APK & AAB)
-        run: |
-          npx cap copy android
+          npx cap sync android
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleDebug bundleRelease
+          ./gradlew assembleDebug
 
-      - name: Upload Output Files
-        uses: actions/upload-artifact@v3
+      - name: Upload Test APK
+        uses: actions/upload-artifact@v4
         with:
-          name: K2-Studio-Android-Builds
-          path: |
-            android/app/build/outputs/apk/debug/*.apk
-            android/app/build/outputs/bundle/release/*.aab
+          name: K2-Studio-Test-APK
+          path: android/app/build/outputs/apk/debug/*.apk
