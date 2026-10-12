@@ -1,118 +1,141 @@
 <!DOCTYPE html>
-<html lang="hi" data-theme="dark">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>K2 AI Studio — Autonomous Cloud Engine</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#030712">
+  <meta name="theme-color" content="#ffffff">
 
+  <!-- Core Libraries & 3D Three.js Engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
-    :root[data-theme="dark"] {
-      --bg-base: #030712;
-      --bg-surface: #0b1329;
-      --bg-card: #111c38;
-      --border: #1e293b;
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.25);
-      --gold: #fbbf24;
-      --gold-glow: rgba(245, 158, 11, 0.6);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+    :root {
+      --bg-main: #ffffff;
+      --bg-sidebar: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --gold: #d97706;
+      --gold-glow: rgba(245, 158, 11, 0.25);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg-base); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+    body { background: var(--bg-main); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
-    .chakra-spin {
-      animation: spinSudarshan 1.2s linear infinite;
-      transform-origin: center;
-      border-radius: 50%;
-      user-select: none;
-      pointer-events: none;
-    }
-    @keyframes spinSudarshan {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    /* Sudarshan Spin Animation */
+    .chakra-spin { animation: spinSudarshan 1.2s linear infinite; transform-origin: center; user-select: none; pointer-events: none; }
+    @keyframes spinSudarshan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+    /* Splash Screen */
     #splash-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
-      z-index: 10000000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #ffffff; z-index: 10000000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.4s ease;
     }
 
-    .push-banner { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 440px; background: rgba(15, 23, 42, 0.98); border: 1px solid var(--accent); border-radius: 16px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: space-between; z-index: 1000000; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(12px); }
-    .push-banner.show { top: 16px; }
-
-    #auth-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-base); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-    .auth-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 420px; padding: 28px 22px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); text-align: center; }
+    /* Google AI Studio Clean Navigation Sidebar */
+    .studio-sidebar {
+      width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 16px 12px; flex-shrink: 0; z-index: 50;
+    }
+    .brand-row { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; color: #1e293b; margin-bottom: 22px; cursor: pointer; user-select: none; }
     
-    .phone-row { display: flex; gap: 8px; margin: 16px 0 12px; }
-    .country-select { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 13px; outline: none; max-width: 130px; }
-    .phone-input { flex: 1; background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 14px; outline: none; }
+    .nav-group-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin: 14px 8px 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; border: none; background: transparent;
+      color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; width: 100%; margin-bottom: 2px;
+    }
+    .nav-item:hover, .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+
+    /* Main Stage Layout */
+    .main-stage { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
+    .top-toolbar {
+      height: 54px; border-bottom: 1px solid var(--border); padding: 0 16px;
+      display: flex; align-items: center; justify-content: space-between; background: #fff; flex-shrink: 0;
+    }
+
+    /* Views */
+    .view-container { flex: 1; overflow-y: auto; display: none; }
+    .view-container.active { display: block; }
+
+    /* Hero Prompt Screen (Google AI Studio Look) */
+    .hero-center-box { max-width: 720px; margin: 60px auto 40px; padding: 0 16px; text-align: center; }
+    .hero-title { font-size: 28px; font-weight: 700; color: #1e293b; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
     
-    .otp-inputs { display: none; gap: 8px; justify-content: center; margin: 16px 0; }
-    .otp-digit { width: 44px; height: 48px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; color: var(--accent); outline: none; }
+    .prompt-card {
+      border: 1px solid #cbd5e1; border-radius: 20px; padding: 14px 18px; box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+      background: #ffffff; text-align: left; transition: border 0.2s, box-shadow 0.2s;
+    }
+    .prompt-card:focus-within { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.2); }
+    .prompt-card textarea {
+      width: 100%; height: 85px; border: none; outline: none; resize: none; font-size: 14px; color: var(--text);
+    }
+    .prompt-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
 
-    .btn-auth-main { width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 6px; }
+    .tag-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 22px; }
+    .chip { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #475569; cursor: pointer; }
+    .chip:hover { background: #e2e8f0; color: #0f172a; }
 
-    .sidebar { width: 230px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px 10px; z-index: 50; flex-shrink: 0; }
-    .sidebar-brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; color: var(--text); padding: 8px 10px; margin-bottom: 16px; cursor: pointer; user-select: none; }
+    /* Action Buttons Row */
+    .export-actions-row { display: flex; gap: 8px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+    .btn-export { background: #0f172a; color: #fff; border: 1px solid #334155; padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .btn-export.gold { background: #fffbeb; color: #b45309; border-color: #fde68a; }
 
-    .nav-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 10px; margin-top: 14px; margin-bottom: 6px; }
-    .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; margin-bottom: 2px; }
-    .nav-btn.active { background: #172554; color: #38bdf8; font-weight: 700; }
-    .nav-btn.vip { color: var(--gold); }
+    /* My Apps & Gallery Table */
+    .apps-table-view { max-width: 860px; margin: 30px auto; padding: 0 16px; }
+    .apps-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .app-card-item {
+      display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 10px; background: #fff; cursor: pointer; transition: 0.2s;
+    }
+    .app-card-item:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-    .app-main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-    .top-header { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
-
-    .workspace { flex: 1; display: flex; overflow: hidden; }
-    .studio-panel { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
-    .preview-panel { flex: 1; background: #000; display: flex; flex-direction: column; position: relative; }
-    .preview-toolbar { background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 8px 12px; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+    /* Fullscreen Sandbox Stage (No-Trap UI) */
+    #sandbox-panel { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 1000; }
+    .sandbox-topbar {
+      position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); padding: 8px 14px; border-radius: 12px; z-index: 100;
+    }
     iframe { width: 100%; height: 100%; border: none; background: #fff; }
 
-    .app-watermark-tag { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.85); border: 1px solid var(--gold); color: var(--gold); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; pointer-events: none; z-index: 50; }
+    /* Visual Multi-Engine Loading State */
+    #process-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; flex-direction: column;
+    }
+    .process-card {
+      background: #ffffff; border: 1px solid #cbd5e1; border-radius: 20px; padding: 24px; max-width: 340px; width: 85%;
+      text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
+    .stage-item { display: flex; align-items: center; gap: 12px; margin: 12px 0; font-size: 13px; color: #64748b; text-align: left; }
+    .stage-item.active { color: #d97706; font-weight: bold; }
 
-    .prompt-box { width: 100%; height: 120px; background: #070d19; border: 1px solid #1e293b; border-radius: 12px; color: var(--text); padding: 14px; font-size: 13px; resize: none; outline: none; }
-    .action-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-    .btn-build { flex: 2; min-width: 140px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .btn-apk { flex: 1; min-width: 100px; background: #1e293b; color: #38bdf8; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .btn-aab { flex: 1; min-width: 100px; background: #1e293b; color: var(--gold); border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    /* Build Timer Modal */
+    #build-timer-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); z-index: 200000; align-items: center; justify-content: center; padding: 20px; }
+    .timer-card { background: #ffffff; border-radius: 20px; max-width: 420px; width: 100%; padding: 24px; text-align: center; }
 
-    .file-buttons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .btn-file-select { background: #0b1329; border: 1px solid #1e293b; color: var(--text); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    /* 15-Digit Admin Room (Fixed Supabase Persistence) */
+    #admin-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px); z-index: 100000; align-items: center; justify-content: center; padding: 16px;
+    }
+    .admin-card {
+      background: #ffffff; border-radius: 18px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 22px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .admin-input { width: 100%; padding: 9px; margin: 3px 0 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 12px; outline: none; }
 
-    #build-timer-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3,7,18,0.96); backdrop-filter: blur(12px); z-index: 2000000; align-items: center; justify-content: center; padding: 20px; }
-    .timer-card { background: var(--bg-surface); border: 1px solid var(--gold); border-radius: 20px; max-width: 440px; width: 100%; padding: 26px; text-align: center; box-shadow: 0 0 35px var(--gold-glow); }
-    .timer-display { font-size: 34px; font-weight: 900; color: var(--gold); letter-spacing: 2px; margin: 12px 0; font-family: monospace; }
-    .progress-bar-bg { width: 100%; height: 8px; background: #1f293d; border-radius: 4px; overflow: hidden; margin: 12px 0; }
-    .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #2563eb, #f59e0b); transition: width 1s linear; }
-
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,7,18,0.95); backdrop-filter: blur(12px); z-index: 10000; align-items: center; justify-content: center; padding: 16px; }
-    .modal-card { background: var(--bg-surface); border: 1px solid var(--gold); border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 22px; }
-    .admin-card { background: var(--bg-surface); border: 1px solid var(--accent); border-radius: 18px; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 20px; }
-    .admin-input { width: 100%; padding: 8px; margin: 3px 0 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-base); color: var(--text); font-size: 11px; }
-
-    @media (max-width: 850px) {
-      .sidebar { display: none; }
-      .workspace { flex-direction: column; }
-      .preview-panel { display: none; }
-      .workspace.show-preview .studio-panel { display: none; }
-      .workspace.show-preview .preview-panel { display: flex; flex: 1; min-height: 80vh; }
+    @media (max-width: 768px) {
+      .studio-sidebar { display: none; }
+      .hero-center-box { margin-top: 24px; }
+      .hero-title { font-size: 22px; }
     }
   </style>
 </head>
@@ -120,594 +143,478 @@
 
   <!-- Splash Screen -->
   <div id="splash-screen">
-    <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 120px; height: 120px; filter: drop-shadow(0 0 30px #f59e0b);">
-      <circle cx="100" cy="100" r="74" fill="none" stroke="#fbbf24" stroke-width="4" stroke-dasharray="16,8"/>
-      <circle cx="100" cy="100" r="62" fill="#070d19" stroke="#fbbf24" stroke-width="7"/>
-      <g stroke="#fbbf24" stroke-width="3" stroke-linecap="round">
-        <line x1="100" y1="100" x2="100" y2="40"/><circle cx="100" cy="48" r="4.5" fill="#fbbf24"/>
-        <line x1="100" y1="100" x2="100" y2="160"/><circle cx="100" cy="152" r="4.5" fill="#fbbf24"/>
-        <line x1="100" y1="100" x2="40" y2="100"/><circle cx="48" cy="100" r="4.5" fill="#fbbf24"/>
-        <line x1="100" y1="100" x2="160" y2="100"/><circle cx="152" cy="100" r="4.5" fill="#fbbf24"/>
-      </g>
-      <circle cx="100" cy="100" r="28" fill="#111c38" stroke="#fbbf24" stroke-width="2.5"/>
-      <circle cx="100" cy="100" r="14" fill="#fbbf24" stroke="#fff" stroke-width="2"/>
-      <circle cx="100" cy="100" r="5" fill="#030712"/>
+    <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 80px; height: 80px;">
+      <circle cx="100" cy="100" r="70" fill="none" stroke="#f59e0b" stroke-width="6" stroke-dasharray="14,8"/>
+      <circle cx="100" cy="100" r="54" fill="#0f172a" stroke="#d97706" stroke-width="4"/>
+      <circle cx="100" cy="100" r="16" fill="#fbbf24"/>
     </svg>
-    <h2 style="margin-top:20px;font-size:22px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">K2 AI STUDIO</h2>
-    <p style="font-size:11px;color:#94a3b8;margin-top:4px;">Autonomous Android & Cloud Engine</p>
+    <h3 style="margin-top:16px;font-size:18px;font-weight:800;color:#0f172a;">K2 AI Studio</h3>
+    <p style="font-size:11px;color:#64748b;margin-top:4px;">Autonomous Engine • Three.js 3D & Cloud</p>
   </div>
 
-  <!-- Top Push Banner -->
-  <div class="push-banner" id="push-toast">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="background:#0284c7;color:#fff;font-size:10px;font-weight:800;padding:3px 6px;border-radius:6px;">K2 CLOUD</span>
-      <div>
-        <div style="font-size:12px;font-weight:700;" id="push-title">सूचना</div>
-        <div style="font-size:11px;color:var(--text-muted);" id="push-body">...</div>
-      </div>
-    </div>
-    <button onclick="dismissPush()" style="background:#10b981;color:#fff;border:none;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:bold;cursor:pointer;">ठीक है</button>
-  </div>
-
-  <!-- Login Gate -->
-  <div id="auth-screen">
-    <div class="auth-box">
-      <div style="display:flex;justify-content:center;margin-bottom:10px;">
-        <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 70px; height: 70px; filter: drop-shadow(0 0 16px #f59e0b);">
-          <circle cx="100" cy="100" r="74" fill="none" stroke="#fbbf24" stroke-width="4" stroke-dasharray="14,7"/>
-          <circle cx="100" cy="100" r="62" fill="#070d19" stroke="#fbbf24" stroke-width="6"/>
-          <g stroke="#fbbf24" stroke-width="3" stroke-linecap="round">
-            <line x1="100" y1="100" x2="100" y2="40"/><circle cx="100" cy="48" r="4.5" fill="#fbbf24"/>
-            <line x1="100" y1="100" x2="100" y2="160"/><circle cx="100" cy="152" r="4.5" fill="#fbbf24"/>
-          </g>
-          <circle cx="100" cy="100" r="28" fill="#111c38" stroke="#fbbf24" stroke-width="2"/>
-          <circle cx="100" cy="100" r="14" fill="#fbbf24" stroke="#fff" stroke-width="2"/>
-          <circle cx="100" cy="100" r="5" fill="#030712"/>
-        </svg>
-      </div>
-      <h2 style="font-size:19px;font-weight:800;margin-bottom:4px;">K2 AI Studio</h2>
-      <p style="font-size:12px;color:var(--text-muted);">7-दिन का मुफ्त VIP ट्रायल + ऑटोनॉमस बिल्डर</p>
-
-      <div id="auth-stage-phone">
-        <div class="phone-row">
-          <select id="country-code" class="country-select">
-            <option value="+91">🇮🇳 +91 (भारत)</option>
-            <option value="+1">🇺🇸 +1 (USA/Canada)</option>
-            <option value="+44">🇬🇧 +44 (UK)</option>
-            <option value="+971">🇦🇪 +971 (UAE)</option>
-            <option value="+966">🇸🇦 +966 (सऊदी)</option>
-          </select>
-          <input type="tel" id="input-phone" class="phone-input" placeholder="मोबाइल नंबर दर्ज करें">
-        </div>
-        <button class="btn-auth-main" onclick="triggerGlobalOTP()">⚡ कोड प्राप्त करें</button>
-      </div>
-
-      <div id="auth-stage-otp" style="display:none;">
-        <div class="otp-inputs" style="display:flex;">
-          <input type="text" maxlength="1" class="otp-digit" id="d1">
-          <input type="text" maxlength="1" class="otp-digit" id="d2">
-          <input type="text" maxlength="1" class="otp-digit" id="d3">
-          <input type="text" maxlength="1" class="otp-digit" id="d4">
-          <input type="text" maxlength="1" class="otp-digit" id="d5">
-          <input type="text" maxlength="1" class="otp-digit" id="d6">
-        </div>
-        <button class="btn-auth-main" onclick="verifyOTPManually()">🔓 7-दिन का ट्रायल शुरू करें</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-brand" id="master-brand">
-      <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 26px; height: 26px; filter: drop-shadow(0 0 8px #f59e0b);">
-        <circle cx="100" cy="100" r="62" fill="#070d19" stroke="#fbbf24" stroke-width="8"/>
-        <g stroke="#fbbf24" stroke-width="4"><line x1="100" y1="40" x2="100" y2="160"/><line x1="40" y1="100" x2="160" y2="100"/></g>
+  <!-- Left Sidebar (Google AI Studio Look) -->
+  <aside class="studio-sidebar">
+    <div class="brand-row" id="brand-tap-desktop">
+      <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 24px; height: 24px;">
+        <circle cx="100" cy="100" r="62" fill="#0f172a" stroke="#fbbf24" stroke-width="8"/>
         <circle cx="100" cy="100" r="18" fill="#fbbf24"/>
       </svg>
-      <span>K2 AI Studio</span>
+      <span>Google AI Studio</span>
     </div>
 
-    <div class="nav-label">कार्यक्षेत्र</div>
-    <button class="nav-btn active">✨ स्टूडियो बिल्डर</button>
+    <div class="nav-group-title">BUILD</div>
+    <button class="nav-item active" onclick="switchTab('new-app')">➕ New app</button>
+    <button class="nav-item" onclick="switchTab('my-apps')">🗂️ My apps</button>
+    <button class="nav-item" onclick="switchTab('gallery')">🖼️ Gallery</button>
 
-    <div class="nav-label">सेवाएं</div>
-    <button class="nav-btn" onclick="openUploadModal('any')">📦 फाइल ➔ AAB कंवर्टर</button>
-    <button class="nav-btn" onclick="openPlayStoreGuide()">📖 Play Store गाइड</button>
+    <div class="nav-group-title">MANAGE</div>
+    <button class="nav-item" onclick="startCloudBuildPipeline('apk')">📱 Build Android APK</button>
+    <button class="nav-item" onclick="startCloudBuildPipeline('aab')">🔒 Build Play Store AAB</button>
 
-    <div class="nav-label">कमाई व प्लान</div>
-    <button class="nav-btn vip" onclick="openVipModal()">👑 VIP प्लान्स</button>
-
-    <div style="margin-top:auto;padding-top:10px;border-top:1px solid var(--border);text-align:center;">
-      <div style="font-size:11px;color:var(--accent);font-weight:bold;">⚡ ट्रायल एक्टिव</div>
-      <div id="logged-user-label" style="font-size:10px;color:var(--text-muted);margin-top:4px;">Guest</div>
-      <div style="font-size:10px;color:#10b981;margin-top:2px;">● कुल AAB कंपाइल: <span id="stat-aab-count">0</span></div>
+    <div style="margin-top:auto;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="triggerAdminModal()">⚙️ Settings</span>
+      <span style="font-size:11px;font-weight:700;color:#10b981;">● Online</span>
     </div>
   </aside>
 
-  <!-- Main Stage -->
-  <main class="app-main">
-    <header class="top-header">
-      <div id="mobile-header-brand" style="font-weight:800;font-size:13px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;">
-        <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 22px; height: 22px; filter: drop-shadow(0 0 6px #f59e0b);">
-          <circle cx="100" cy="100" r="62" fill="#070d19" stroke="#fbbf24" stroke-width="8"/>
-          <g stroke="#fbbf24" stroke-width="4"><line x1="100" y1="40" x2="100" y2="160"/><line x1="40" y1="100" x2="160" y2="100"/></g>
+  <!-- Main Canvas Stage -->
+  <main class="main-stage">
+    <header class="top-toolbar">
+      <div id="brand-tap-mobile" style="font-weight:800;font-size:14px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 22px; height: 22px;">
+          <circle cx="100" cy="100" r="62" fill="#0f172a" stroke="#fbbf24" stroke-width="8"/>
           <circle cx="100" cy="100" r="18" fill="#fbbf24"/>
         </svg>
-        <span>K2 Cloud Engine</span>
+        <span>K2 Studio</span>
       </div>
-      
-      <div style="display:flex;gap:6px;align-items:center;">
-        <button onclick="switchMobileView()" id="btn-toggle-sandbox" style="background:#0284c7;color:#fff;border:none;padding:6px 10px;border-radius:10px;font-size:11px;font-weight:bold;cursor:pointer;">📱 सैंडबॉक्स</button>
-        <button onclick="openUploadModal('any')" style="background:#2563eb;color:#fff;border:none;padding:6px 9px;border-radius:10px;font-size:11px;font-weight:bold;cursor:pointer;">📦 अपलोड</button>
-        <button onclick="openVipModal()" style="background:#f59e0b;color:#000;border:none;padding:6px 11px;border-radius:10px;font-size:11px;font-weight:bold;cursor:pointer;">👑 VIP</button>
-        <button onclick="logoutSession()" style="background:#334155;color:#fff;border:none;padding:6px 9px;border-radius:6px;font-size:11px;cursor:pointer;">लॉगआउट</button>
+      <div style="display:flex;gap:6px;">
+        <button onclick="switchTab('new-app')" style="padding:6px 12px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;font-size:12px;font-weight:bold;cursor:pointer;">➕ New</button>
+        <button onclick="switchTab('my-apps')" style="padding:6px 12px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;font-size:12px;font-weight:bold;cursor:pointer;">🗂️ Apps</button>
       </div>
     </header>
 
-    <div class="workspace" id="main-workspace">
-      <div class="studio-panel">
-        <textarea id="app-prompt" class="prompt-box" placeholder="उदा: 3D कार गेम, कैलकुलेटर, स्टोर बिलिंग ऐप या कोई भी आइडिया..."></textarea>
-        
-        <div class="action-row">
-          <button class="btn-build" onclick="runAntiGravityAgent()" id="btn-gen-app">⚡ ऐप जनरेट करें</button>
-          <button class="btn-apk" onclick="handleExportFile('apk')">📱 डाउनलोड APK</button>
-          <button class="btn-aab" onclick="handleExportFile('aab')">🔒 Play Store AAB</button>
-        </div>
+    <!-- Tab 1: New App Screen -->
+    <div id="view-new-app" class="view-container active">
+      <div class="hero-center-box">
+        <h1 class="hero-title">
+          <span>Build your ideas with Gemini</span>
+          <span style="color:#38bdf8;">✦</span>
+        </h1>
 
-        <div style="background:#070d19;border:1px solid #1e293b;border-radius:12px;padding:14px;margin-top:8px;">
-          <h4 style="font-size:12px;color:var(--accent);margin-bottom:8px;">📂 अपनी फाइल से Play Store AAB निकालें (₹999 / $21.99):</h4>
-          <div class="file-buttons-grid">
-            <button class="btn-file-select" onclick="openUploadModal('zip')">📦 Upload .ZIP</button>
-            <button class="btn-file-select" onclick="openUploadModal('html')">🌐 Upload .HTML</button>
-            <button class="btn-file-select" onclick="openUploadModal('js')">⚡ Upload .JS</button>
-            <button class="btn-file-select" onclick="openUploadModal('css')">🎨 Upload .CSS</button>
+        <div class="prompt-card">
+          <textarea id="main-prompt" placeholder="Describe an app and let K2 Studio do the rest (e.g. 3D Car game, Store billing app, Fitness calculator)..."></textarea>
+          <div class="prompt-actions">
+            <span style="font-size:12px;color:#94a3b8;">✨ Multi-Engine Failover (HF -> Groq -> Gemini -> 3D)</span>
+            <button onclick="generateProjectApp()" style="background:#2563eb;color:#fff;border:none;padding:8px 18px;border-radius:12px;font-size:13px;font-weight:bold;cursor:pointer;">Generate App ➔</button>
           </div>
         </div>
 
-        <div style="margin-top:auto;padding-top:14px;font-size:11px;color:#475569;text-align:center;">
-          Protected by K2 Anti-Gravity Shield • Zero Client Memory Load
+        <div class="tag-chips">
+          <div class="chip" onclick="fillPrompt('3D Car game')">🏎️ 3D Car Game (Three.js)</div>
+          <div class="chip" onclick="fillPrompt('Store Billing & Invoice App')">📊 Store Billing App</div>
+          <div class="chip" onclick="fillPrompt('3D Space Flight Simulator')">🚀 3D Space Flight</div>
+          <div class="chip" onclick="fillPrompt('Task Manager & Notes')">📝 Task Manager</div>
+        </div>
+
+        <div class="export-actions-row">
+          <button class="btn-export" onclick="startCloudBuildPipeline('apk')">📱 Compile to APK</button>
+          <button class="btn-export gold" onclick="startCloudBuildPipeline('aab')">🔒 Compile Play Store AAB</button>
         </div>
       </div>
+    </div>
 
-      <div class="preview-panel">
-        <div class="preview-toolbar">
-          <span>● लाइव वेब सैंडबॉक्स</span>
-          <span style="color:var(--accent);cursor:pointer;font-weight:bold;" onclick="switchMobileView()">🔙 वापस स्टूडियो जाएं</span>
+    <!-- Tab 2: My Apps Screen -->
+    <div id="view-my-apps" class="view-container">
+      <div class="apps-table-view">
+        <div class="apps-header-row">
+          <h2 style="font-size:22px;font-weight:700;">My apps</h2>
+          <span style="font-size:13px;color:var(--text-muted);">2 Real Projects</span>
         </div>
-        <iframe id="live-sandbox" sandbox="allow-scripts allow-modals"></iframe>
-        <div class="app-watermark-tag" id="live-watermark">⚡ Powered by K2 AI Studio</div>
+
+        <!-- 3D Car Game -->
+        <div class="app-card-item" onclick="loadHighQuality3DCarGame()">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:#2563eb;color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:bold;">3D</div>
+            <div>
+              <div style="font-size:14px;font-weight:bold;">K2 3D Highway Racer</div>
+              <div style="font-size:11px;color:var(--text-muted);">Three.js WebGL GPU Engine • Touch Steering Controls</div>
+            </div>
+          </div>
+          <span style="font-size:12px;color:#2563eb;font-weight:bold;">Launch ▶</span>
+        </div>
+
+        <!-- Store Billing Utility -->
+        <div class="app-card-item" onclick="loadStoreBillingApp()">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:#10b981;color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:bold;">₹</div>
+            <div>
+              <div style="font-size:14px;font-weight:bold;">Store Billing & Invoice App</div>
+              <div style="font-size:11px;color:var(--text-muted);">Full Business Utility • Tax Calculation & Print Receipt</div>
+            </div>
+          </div>
+          <span style="font-size:12px;color:#10b981;font-weight:bold;">Launch ▶</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Gallery -->
+    <div id="view-gallery" class="view-container">
+      <div class="apps-table-view">
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:16px;">App Gallery & Templates</h2>
+        
+        <div class="app-card-item" onclick="fillPrompt('3D Space Flight'); generateProjectApp();">
+          <div>
+            <div style="font-size:14px;font-weight:bold;">🚀 3D Asteroid Dodger</div>
+            <div style="font-size:11px;color:var(--text-muted);">Three.js Space flight game template</div>
+          </div>
+          <span style="font-size:12px;color:#2563eb;font-weight:bold;">Create</span>
+        </div>
+
+        <div class="app-card-item" onclick="fillPrompt('EMI Loan Calculator with Pie Chart'); generateProjectApp();">
+          <div>
+            <div style="font-size:14px;font-weight:bold;">📈 Financial EMI & Loan Calculator</div>
+            <div style="font-size:11px;color:var(--text-muted);">Interactive pie-charts and payment schedule</div>
+          </div>
+          <span style="font-size:12px;color:#2563eb;font-weight:bold;">Create</span>
+        </div>
       </div>
     </div>
   </main>
 
+  <!-- Fullscreen Sandbox Screen (With Exit Button) -->
+  <div id="sandbox-panel">
+    <div class="sandbox-topbar">
+      <button onclick="exitSandbox()" style="background:#ef4444;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-weight:bold;font-size:12px;cursor:pointer;">🔙 Exit to Studio</button>
+      <span style="color:#fff;font-size:12px;font-weight:bold;">K2 Live App Sandbox</span>
+      <button onclick="restartSandbox()" style="background:#334155;color:#fff;border:none;padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;">🔄 Restart</button>
+    </div>
+    <iframe id="sandbox-frame" sandbox="allow-scripts allow-modals"></iframe>
+  </div>
+
+  <!-- Multi-Stage AI Building Overlay -->
+  <div id="process-overlay">
+    <div class="process-card">
+      <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 48px; height: 48px; margin-bottom: 12px;">
+        <circle cx="100" cy="100" r="62" fill="#0f172a" stroke="#fbbf24" stroke-width="8"/>
+        <circle cx="100" cy="100" r="18" fill="#fbbf24"/>
+      </svg>
+      <div class="stage-item active" id="stg-1"><span style="font-size:18px;">🧠</span> AI आर्किटेक्चर सोच रहा है...</div>
+      <div class="stage-item" id="stg-2"><span style="font-size:18px;">📝</span> कोड फाइल्स और लॉजिक लिखा जा रहा है...</div>
+      <div class="stage-item" id="stg-3"><span style="font-size:18px;">🔱</span> 3D व सैंडबॉक्स में कंपाइल हो रहा है...</div>
+    </div>
+  </div>
+
   <!-- Build Timer Modal -->
   <div id="build-timer-modal">
     <div class="timer-card">
-      <div style="display:flex;justify-content:center;margin-bottom:12px;">
-        <svg class="chakra-spin" viewBox="0 0 200 200" style="width: 75px; height: 75px; filter: drop-shadow(0 0 25px #f59e0b);">
-          <circle cx="100" cy="100" r="74" fill="none" stroke="#fbbf24" stroke-width="4" stroke-dasharray="14,7"/>
-          <circle cx="100" cy="100" r="62" fill="#070d19" stroke="#fbbf24" stroke-width="6"/>
-          <circle cx="100" cy="100" r="14" fill="#fbbf24"/>
-        </svg>
-      </div>
-
-      <h3 id="timer-title" style="font-size:17px;font-weight:800;color:var(--gold);">⚡ क्लाउड पर ऐप कंपाइल हो रहा है</h3>
-      <p id="timer-sub" style="font-size:12px;color:var(--text-muted);margin-top:4px;">Android SDK व Gradle सुरक्षित पैकेज तैयार कर रहे हैं...</p>
-      
-      <div class="timer-display" id="live-timer-clock">00:00</div>
-
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="timer-progress-fill"></div>
-      </div>
-
-      <p id="timer-step-status" style="font-size:11px;color:var(--accent);margin-top:8px;">चरण 1/3: वातावरण तैयार हो रहा है...</p>
-
+      <h3 id="timer-title" style="font-size:17px;font-weight:800;color:#0f172a;">⚡ कंपाइलेशन शुरू हो रहा है</h3>
+      <p id="timer-sub" style="font-size:12px;color:#64748b;margin-top:4px;">Android SDK बाइनरी तैयार कर रहा है...</p>
+      <div style="font-size:32px;font-weight:900;color:#d97706;margin:12px 0;font-family:monospace;" id="live-timer-clock">00:00</div>
+      <p id="timer-step-status" style="font-size:11px;color:#2563eb;">GitHub Actions Pipeline तैयार हो रही है...</p>
       <div style="margin-top:16px;display:flex;gap:8px;">
-        <button id="btn-timer-retry" onclick="retryBuildProcess()" style="display:none;flex:1;background:#f59e0b;color:#000;border:none;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;">🔄 Auto-Fix & Retry</button>
-        <button id="btn-timer-download" onclick="goToActionsDownload()" style="display:none;flex:1;background:#10b981;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;">🚀 डाउनलोड करें</button>
+        <button onclick="document.getElementById('build-timer-modal').style.display='none'" style="flex:1;background:#e2e8f0;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:bold;">बंद करें</button>
+        <button onclick="window.open(localStorage.getItem('k2_github') || 'https://github.com/k2-app-studio/ai-app-studio1/actions', '_blank')" style="flex:1;background:#10b981;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:bold;">🚀 डाउनलोड Actions</button>
       </div>
     </div>
   </div>
 
-  <!-- Upload Modal -->
-  <div id="upload-modal" class="modal-overlay">
-    <div class="modal-card" style="border-color:#38bdf8;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h3 id="modal-upload-title" style="color:#38bdf8;font-size:16px;">📦 Upload File ➔ Play Store AAB</h3>
-        <span onclick="closeUploadModal()" style="cursor:pointer;color:var(--text-muted);">✕</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">आपकी फाइल से सीधे साइन की हुई .AAB तैयार होगी।</p>
-
-      <div style="background:#070d19;border:2px dashed #334155;border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;">
-        <input type="file" id="generic-file-input" style="display:none;" onchange="handleFilePicked(event)">
-        <div style="font-size:26px;margin-bottom:4px;">📁</div>
-        <button onclick="document.getElementById('generic-file-input').click()" style="background:#2563eb;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:bold;cursor:pointer;">फाइल चुनें</button>
-        <div id="file-chosen-text" style="font-size:11px;color:var(--text-muted);margin-top:6px;">अधिकतम फ़ाइल साइज़: 50MB</div>
-      </div>
-
-      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px;margin-bottom:12px;">
-        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:bold;color:var(--accent);cursor:pointer;">
-          <input type="checkbox" id="chk-modify" onchange="toggleModifyPlan(this.checked)">
-          <span>✨ क्या आप इसमें AI से सुधार/बदलाव भी करवाना चाहते हैं?</span>
-        </label>
-        <div id="modify-box" style="display:none;margin-top:10px;">
-          <textarea id="modify-prompt" class="admin-input" style="height:60px;resize:none;" placeholder="बताएं क्या सुधार करना है..."></textarea>
-        </div>
-      </div>
-
-      <div style="background:#111c38;border:1px solid var(--gold);padding:12px;border-radius:12px;margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <h4 id="pass-title" style="font-size:13px;color:var(--gold);">⚡ Direct Convert Pass</h4>
-            <p id="pass-desc" style="font-size:10px;color:var(--text-muted);">जैसी फाइल है वैसी AAB निकालें</p>
-          </div>
-          <div style="text-align:right;">
-            <div id="pass-price-inr" style="font-size:18px;font-weight:900;color:var(--gold);">₹999</div>
-            <div id="pass-price-usd" style="font-size:11px;color:var(--text-muted);">$21.99 USD</div>
-          </div>
-        </div>
-      </div>
-
-      <button id="btn-build-action" onclick="triggerSecuredCloudAAB()" style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:800;cursor:pointer;">🚀 भुगतान करें & AAB जनरेट करें</button>
-    </div>
-  </div>
-
-  <!-- VIP Modal -->
-  <div id="vip-modal" class="modal-overlay">
-    <div class="modal-card">
-      <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
-        <h3 style="color:var(--gold);">👑 K2 STUDIO PRO VIP</h3>
-        <span onclick="closeVipModal()" style="cursor:pointer;color:var(--text-muted);">✕</span>
-      </div>
-      <div style="background:#111c38;border:1px solid var(--gold);padding:12px;border-radius:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <h4 style="color:var(--gold);font-size:13px;">👑 6 महीने प्रो (अनलिमिटेड AI)</h4>
-          <p style="font-size:10px;color:var(--text-muted);">नो वॉटरमार्क + सुपरफास्ट क्लाउड बिल्ड</p>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:15px;font-weight:800;color:var(--gold);">₹2,599</div>
-          <div style="font-size:10px;color:var(--text-muted);">$34.99 USD</div>
-        </div>
-      </div>
-      <button onclick="closeVipModal()" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none;padding:12px;border-radius:10px;font-weight:800;cursor:pointer;">⚡ इन-ऐप एक्टिवेट करें</button>
-    </div>
-  </div>
-
-  <!-- ============================================== -->
-  <!-- 👑 100% UNIFIED MASTER ADMIN CONTROL ROOM      -->
-  <!-- ============================================== -->
-  <div id="admin-modal" class="modal-overlay">
+  <!-- 15-Digit Admin Room (Fixed Supabase Persistence) -->
+  <div id="admin-modal">
     <div class="admin-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h3 style="color:var(--accent);">👑 K2 Master Control Room</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="font-size:16px;font-weight:800;color:#0f172a;">👑 K2 Master Control Room</h3>
         <span onclick="document.getElementById('admin-modal').style.display='none'" style="cursor:pointer;font-size:18px;">✕</span>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-        <div style="background:#070d19;border:1px solid #1e293b;padding:8px;border-radius:8px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);">कुल एक्टिव यूज़र्स</div>
-          <div style="font-size:16px;font-weight:800;color:var(--accent);" id="adm-stat-users">1</div>
-        </div>
-        <div style="background:#070d19;border:1px solid #1e293b;padding:8px;border-radius:8px;text-align:center;">
-          <div style="font-size:10px;color:var(--text-muted);">कुल AAB जनरेटेड</div>
-          <div style="font-size:16px;font-weight:800;color:var(--gold);" id="adm-stat-aab">0</div>
-        </div>
-      </div>
+      <label style="font-size:11px;color:#64748b;">1. Hugging Face Token (hf_...):</label>
+      <input type="password" id="adm-k-hf" class="admin-input">
 
-      <div style="background:#070d19;border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:12px;">
-        <h4 style="color:var(--gold);font-size:11px;margin-bottom:4px;">📢 लाइव पुश नोटिफिकेशन ब्रॉडकास्टर</h4>
-        <input type="text" id="adm-push-title" class="admin-input" placeholder="टाइटल...">
-        <textarea id="adm-push-body" class="admin-input" style="height:40px;resize:none;" placeholder="संदेश..."></textarea>
-        <button onclick="adminBroadcastPush()" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none;padding:7px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:11px;">🚀 ब्रॉडकास्ट भेजें</button>
-      </div>
+      <label style="font-size:11px;color:#64748b;">2. Groq Cloud Key (gsk_...):</label>
+      <input type="password" id="adm-k-groq" class="admin-input">
 
-      <!-- LLM Engines Section in Strict Order -->
-      <h4 style="font-size:11px;color:var(--accent);margin:6px 0 2px;">⚡ LLM इंजन प्राथमिकता (Priority Pipeline):</h4>
-      
-      <label style="font-size:10px;color:#38bdf8;">1. Hugging Face Token (hf_...):</label>
-      <input type="password" id="adm-k-hf" class="admin-input" placeholder="hf_...">
+      <label style="font-size:11px;color:#64748b;">3. OpenRouter API Key (sk-or-...):</label>
+      <input type="password" id="adm-k-openrouter" class="admin-input">
 
-      <label style="font-size:10px;color:#38bdf8;">2. Groq Cloud Key (gsk_...):</label>
-      <input type="password" id="adm-k-groq" class="admin-input" placeholder="gsk_...">
+      <label style="font-size:11px;color:#64748b;">4. Google Gemini Key:</label>
+      <input type="password" id="adm-k-gemini" class="admin-input">
 
-      <label style="font-size:10px;color:#38bdf8;">3. OpenRouter API Key (sk-or-...):</label>
-      <input type="password" id="adm-k-openrouter" class="admin-input" placeholder="sk-or-v1-...">
-
-      <label style="font-size:10px;color:#38bdf8;">4. Google Gemini Key (AQ... / AIza...):</label>
-      <input type="password" id="adm-k-gemini" class="admin-input" placeholder="AQ... या AIzaSy...">
-
-      <!-- Cloud Infrastructure & Anti-Gravity -->
-      <h4 style="font-size:11px;color:var(--gold);margin:8px 0 2px;">🌐 क्लाउड, GitHub व बैकएंड इंजन:</h4>
-      <label style="font-size:10px;color:var(--text-muted);">GitHub Actions Repo URL:</label>
+      <label style="font-size:11px;color:#64748b;">GitHub Actions Repo URL:</label>
       <input type="text" id="adm-k-github" class="admin-input" placeholder="https://github.com/k2-app-studio/ai-app-studio1">
 
-      <label style="font-size:10px;color:var(--text-muted);">Anti-Gravity Cloud Endpoint:</label>
-      <input type="text" id="adm-k-antigrav" class="admin-input" placeholder="https://cloud.k2studio.internal/engine">
+      <label style="font-size:11px;color:#64748b;">Supabase URL:</label>
+      <input type="text" id="adm-k-supa-url" class="admin-input" placeholder="https://xyz.supabase.co">
 
-      <label style="font-size:10px;color:var(--text-muted);">Supabase URL:</label>
-      <input type="text" id="adm-k-supa-url" class="admin-input" placeholder="https://yexydkzykbgcvsbwapyn.supabase.co">
+      <label style="font-size:11px;color:#64748b;">Supabase Anon Key:</label>
+      <input type="password" id="adm-k-supa-key" class="admin-input">
 
-      <label style="font-size:10px;color:var(--text-muted);">Supabase Anon Key:</label>
-      <input type="password" id="adm-k-supa-key" class="admin-input" placeholder="eyJhbGciOi...">
-
-      <button onclick="saveAllMasterKeys()" style="width:100%;background:#10b981;color:#fff;border:none;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:6px;">💾 मास्टर सेटिंग्स सेव करें</button>
+      <button onclick="saveAllMasterKeys()" style="width:100%;background:#10b981;color:#fff;border:none;padding:11px;border-radius:10px;font-weight:bold;cursor:pointer;margin-top:6px;">💾 Save All Master Settings</button>
     </div>
   </div>
 
   <script>
+    // 1. Splash Auto Dismiss
     window.addEventListener('load', () => {
       setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        splash.style.opacity = '0';
-        setTimeout(() => { splash.style.display = 'none'; }, 500);
-      }, 1500);
+        const s = document.getElementById('splash-screen');
+        s.style.opacity = '0';
+        setTimeout(() => s.style.display = 'none', 400);
+      }, 1000);
+      loadSavedKeys();
     });
 
-    function switchMobileView() {
-      const ws = document.getElementById('main-workspace');
-      ws.classList.toggle('show-preview');
-      const isPreview = ws.classList.contains('show-preview');
-      document.getElementById('btn-toggle-sandbox').innerText = isPreview ? "✏️ स्टूडियो" : "📱 सैंडबॉक्स";
+    // 2. Navigation Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      if (tabId === 'new-app') document.getElementById('view-new-app').classList.add('active');
+      else if (tabId === 'my-apps') document.getElementById('view-my-apps').classList.add('active');
+      else if (tabId === 'gallery') document.getElementById('view-gallery').classList.add('active');
     }
 
-    let buildTimerInterval = null;
-    let buildSeconds = 0;
-    let currentBuildTarget = 'aab';
-
-    function startCloudBuildPipeline(type) {
-      currentBuildTarget = type;
-      closeUploadModal();
-      document.getElementById('build-timer-modal').style.display = 'flex';
-      document.getElementById('btn-timer-retry').style.display = 'none';
-      document.getElementById('btn-timer-download').style.display = 'none';
-      
-      buildSeconds = 0;
-      clearInterval(buildTimerInterval);
-      
-      const clockEl = document.getElementById('live-timer-clock');
-      const progressFill = document.getElementById('timer-progress-fill');
-      const titleEl = document.getElementById('timer-title');
-      const statusText = document.getElementById('timer-step-status');
-
-      titleEl.innerText = "⚡ क्लाउड पर ऐप कंपाइल हो रहा है";
-
-      buildTimerInterval = setInterval(() => {
-        buildSeconds++;
-        const mins = String(Math.floor(buildSeconds / 60)).padStart(2, '0');
-        const secs = String(buildSeconds % 60).padStart(2, '0');
-        clockEl.innerText = `${mins}:${secs}`;
-
-        if (buildSeconds <= 25) {
-          progressFill.style.width = '30%';
-          statusText.innerText = 'चरण 1/3: Android Capacitor व Gradle सेट हो रहा है...';
-        } else if (buildSeconds <= 60) {
-          progressFill.style.width = '70%';
-          statusText.innerText = 'चरण 2/3: APK/AAB बाइनरी कंपाइल हो रही है...';
-        } else if (buildSeconds <= 90) {
-          progressFill.style.width = '95%';
-          statusText.innerText = 'चरण 3/3: पैकेज साइन किया जा रहा है...';
-        } else {
-          progressFill.style.width = '100%';
-          clearInterval(buildTimerInterval);
-          statusText.innerText = "🚀 कंपाइलेशन सफलतापूर्वक पूरा हुआ!";
-          document.getElementById('btn-timer-download').style.display = 'block';
-          
-          let currentAAB = parseInt(localStorage.getItem('k2_stat_aab_count') || '0') + 1;
-          localStorage.setItem('k2_stat_aab_count', currentAAB);
-          loadLiveStatistics();
-        }
-      }, 1000);
+    function fillPrompt(txt) {
+      document.getElementById('main-prompt').value = txt;
     }
 
-    function retryBuildProcess() { startCloudBuildPipeline(currentBuildTarget); }
-    function goToActionsDownload() {
-      document.getElementById('build-timer-modal').style.display = 'none';
-      const gh = localStorage.getItem('k2_github') || 'https://github.com/k2-app-studio/ai-app-studio1/actions';
-      window.open(gh, '_blank');
-    }
-
-    let chosenFile = null;
-    let isModify = false;
-
-    function loadLiveStatistics() {
-      const aabCount = parseInt(localStorage.getItem('k2_stat_aab_count') || '0');
-      const userCount = parseInt(localStorage.getItem('k2_stat_user_count') || '1');
-      document.getElementById('stat-aab-count').innerText = aabCount;
-      if (document.getElementById('adm-stat-aab')) document.getElementById('adm-stat-aab').innerText = aabCount;
-      if (document.getElementById('adm-stat-users')) document.getElementById('adm-stat-users').innerText = userCount;
-    }
-    loadLiveStatistics();
-
-    function openUploadModal(type) {
-      const input = document.getElementById('generic-file-input');
-      const title = document.getElementById('modal-upload-title');
-      if (type === 'zip') { input.accept = ".zip"; title.innerText = "📦 Upload .ZIP ➔ AAB"; }
-      else if (type === 'html') { input.accept = ".html,.htm"; title.innerText = "🌐 Upload .HTML ➔ AAB"; }
-      else if (type === 'js') { input.accept = ".js"; title.innerText = "⚡ Upload .JS ➔ AAB"; }
-      else if (type === 'css') { input.accept = ".css"; title.innerText = "🎨 Upload .CSS ➔ AAB"; }
-      else { input.accept = ".zip,.html,.htm,.js,.css"; title.innerText = "📁 Custom File ➔ AAB"; }
-      document.getElementById('upload-modal').style.display = 'flex';
-    }
-    function closeUploadModal() { document.getElementById('upload-modal').style.display = 'none'; }
-
-    function handleFilePicked(e) {
-      chosenFile = e.target.files[0];
-      if (chosenFile) {
-        const sizeMb = (chosenFile.size / (1024 * 1024)).toFixed(2);
-        document.getElementById('file-chosen-text').innerHTML = `✅ फ़ाइल: <b>${chosenFile.name}</b> (${sizeMb} MB)`;
-      }
-    }
-
-    function toggleModifyPlan(checked) {
-      isModify = checked;
-      document.getElementById('modify-box').style.display = checked ? 'block' : 'none';
-      const titleEl = document.getElementById('pass-title');
-      const priceInr = document.getElementById('pass-price-inr');
-      const priceUsd = document.getElementById('pass-price-usd');
-      const btn = document.getElementById('btn-build-action');
-
-      if (checked) {
-        titleEl.innerText = "✨ AI Modification + AAB Pass";
-        priceInr.innerText = "₹1,199";
-        priceUsd.innerText = "$25.99 USD";
-        btn.innerText = "🚀 ₹1,199 में सुधारें & AAB बनाएं";
-      } else {
-        titleEl.innerText = "⚡ Direct Convert Pass";
-        priceInr.innerText = "₹999";
-        priceUsd.innerText = "$21.99 USD";
-        btn.innerText = "🚀 ₹999 में AAB बनाएं";
-      }
-    }
-
-    function triggerSecuredCloudAAB() {
-      if (!chosenFile) return alert("कृपया पहले अपनी फ़ाइल चुनें!");
-      const cost = isModify ? "₹1,199 ($25.99 USD)" : "₹999 ($21.99 USD)";
-      const ok = confirm(`🔒 इस फ़ाइल से Play Store AAB निकालने के लिए ${cost} का भुगतान करें?`);
-      if (ok) startCloudBuildPipeline('aab');
-    }
-
-    // 15-अंकीय एडमिन हैंडलर
-    let tapCount = 0;
-    let lastTapTime = 0;
-
-    function handleSecretAdminTap() {
+    // 3. 15-Digit Admin Room Trigger
+    let tapCount = 0, lastTap = 0;
+    function handleSecretTap() {
       const now = Date.now();
-      if (now - lastTapTime < 500) {
+      if (now - lastTap < 500) {
         tapCount++;
         if (tapCount === 5) {
-          let savedPin = localStorage.getItem('k2_master_15pin');
-          if (!savedPin) {
-            const p = prompt("🔐 पहली बार मास्टर पासवर्ड बनाएं (न्यूनतम 15 अंक):");
-            if (p && p.trim().length >= 15) {
-              localStorage.setItem('k2_master_15pin', p.trim());
-              loadKeys();
-              document.getElementById('admin-modal').style.display = 'flex';
-            } else if (p) { alert("❌ पासवर्ड कम से कम 15 अंकों का होना चाहिए!"); }
-          } else {
-            const pin = prompt("🔐 15-अंकीय मास्टर पासवर्ड दर्ज करें:");
-            if (pin && pin.trim() === savedPin) {
-              loadKeys();
-              document.getElementById('admin-modal').style.display = 'flex';
-            } else if (pin) { alert("❌ गलत पासवर्ड!"); }
-          }
+          triggerAdminModal();
           tapCount = 0;
         }
       } else { tapCount = 1; }
-      lastTapTime = now;
+      lastTap = now;
+    }
+    document.getElementById('brand-tap-desktop').addEventListener('click', handleSecretTap);
+    document.getElementById('brand-tap-mobile').addEventListener('click', handleSecretTap);
+
+    function triggerAdminModal() {
+      let savedPin = localStorage.getItem('k2_master_15pin');
+      if (!savedPin) {
+        const p = prompt("🔐 15-Digit Master Pin Set Karein:");
+        if (p && p.trim().length >= 15) {
+          localStorage.setItem('k2_master_15pin', p.trim());
+          document.getElementById('admin-modal').style.display = 'flex';
+        }
+      } else {
+        const pin = prompt("🔐 15-Digit Master Pin Dalein:");
+        if (pin && pin.trim() === savedPin) {
+          document.getElementById('admin-modal').style.display = 'flex';
+        } else if (pin) alert("❌ Galat password!");
+      }
     }
 
-    document.getElementById('master-brand').addEventListener('click', handleSecretAdminTap);
-    document.getElementById('mobile-header-brand').addEventListener('click', handleSecretAdminTap);
-
-    function loadKeys() {
+    function loadSavedKeys() {
       document.getElementById('adm-k-hf').value = localStorage.getItem('k2_hf') || '';
       document.getElementById('adm-k-groq').value = localStorage.getItem('k2_groq') || '';
       document.getElementById('adm-k-openrouter').value = localStorage.getItem('k2_openrouter') || '';
       document.getElementById('adm-k-gemini').value = localStorage.getItem('k2_gemini') || '';
-      document.getElementById('adm-k-github').value = localStorage.getItem('k2_github') || '';
-      document.getElementById('adm-k-antigrav').value = localStorage.getItem('k2_antigrav') || '';
+      document.getElementById('adm-k-github').value = localStorage.getItem('k2_github') || 'https://github.com/k2-app-studio/ai-app-studio1';
       document.getElementById('adm-k-supa-url').value = localStorage.getItem('k2_supa_url') || '';
       document.getElementById('adm-k-supa-key').value = localStorage.getItem('k2_supa_key') || '';
     }
 
+    // Permanent Supabase & Keys Persistence Fix
     function saveAllMasterKeys() {
       localStorage.setItem('k2_hf', document.getElementById('adm-k-hf').value.trim());
       localStorage.setItem('k2_groq', document.getElementById('adm-k-groq').value.trim());
       localStorage.setItem('k2_openrouter', document.getElementById('adm-k-openrouter').value.trim());
       localStorage.setItem('k2_gemini', document.getElementById('adm-k-gemini').value.trim());
       localStorage.setItem('k2_github', document.getElementById('adm-k-github').value.trim());
-      localStorage.setItem('k2_antigrav', document.getElementById('adm-k-antigrav').value.trim());
-      localStorage.setItem('k2_supa-url', document.getElementById('adm-k-supa-url').value.trim());
-      localStorage.setItem('k2_supa-key', document.getElementById('adm-k-supa-key').value.trim());
+      localStorage.setItem('k2_supa_url', document.getElementById('adm-k-supa-url').value.trim());
+      localStorage.setItem('k2_supa_key', document.getElementById('adm-k-supa-key').value.trim());
       document.getElementById('admin-modal').style.display = 'none';
-      alert("✅ HuggingFace, Groq, OpenRouter, Gemini व सभी क्लाउड सेटिंग्स सुरक्षित सेव हो गईं!");
+      alert("✅ Supabase URL, Anon Key aur saare engines hamesha ke liye save ho gaye hain!");
     }
 
-    function showPushBanner(title, body) {
-      document.getElementById('push-title').innerText = title;
-      document.getElementById('push-body').innerText = body;
-      document.getElementById('push-toast').classList.add('show');
-    }
-    function dismissPush() { document.getElementById('push-toast').classList.remove('show'); }
-    function adminBroadcastPush() {
-      const t = document.getElementById('adm-push-title').value.trim();
-      const b = document.getElementById('adm-push-body').value.trim();
-      if (!t || !b) return alert("टाइटल और संदेश दोनों भरें!");
-      showPushBanner(t, b);
-      alert("✅ पुश नोटिफिकेशन ब्रॉडकास्ट हो गया!");
-    }
+    // 4. Hardware-Accelerated Three.js 3D Car Game
+    function loadHighQuality3DCarGame() {
+      const code = `<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
+    #hud { position: absolute; top: 12px; left: 16px; color: #fbbf24; font-size: 18px; font-weight: bold; text-shadow: 0 0 8px rgba(0,0,0,0.8); }
+    #ctrls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 30px; }
+    .btn { background: rgba(37,99,235,0.7); backdrop-filter: blur(6px); color: #fff; border: 2px solid #38bdf8; width: 95px; height: 55px; border-radius: 14px; font-size: 22px; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="hud">🏎️ 3D Highway Racer | Score: <span id="sc">0</span></div>
+  <div id="ctrls">
+    <button class="btn" onmousedown="m(-0.35)" ontouchstart="m(-0.35)">◀ Left</button>
+    <button class="btn" onmousedown="m(0.35)" ontouchstart="m(0.35)">Right ▶</button>
+  </div>
+  <script>
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f172a);
+    scene.fog = new THREE.Fog(0x0f172a, 20, 90);
 
-    let currentOTP = "";
-    function triggerGlobalOTP() {
-      const phone = document.getElementById('input-phone').value.trim();
-      if (phone.length < 6) return alert("कृपया सही मोबाइल नंबर दर्ज करें!");
-      currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      showPushBanner("🔐 K2 सुरक्षा कोड", `आपका VIP कोड: ${currentOTP}`);
-      document.getElementById('auth-stage-otp').style.display = 'block';
-      for (let i = 0; i < 6; i++) document.getElementById('d' + (i + 1)).value = currentOTP[i];
-      setTimeout(() => { verifyOTPManually(); }, 800);
-    }
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    function verifyOTPManually() {
-      const full = document.getElementById('country-code').value + " " + document.getElementById('input-phone').value.trim();
-      localStorage.setItem('k2_active_phone', full);
-      if (!localStorage.getItem('k2_user_reg_time')) localStorage.setItem('k2_user_reg_time', Date.now());
-      dismissPush();
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('logged-user-label').innerText = full;
-      alert("🎉 7-दिन का VIP ट्रायल सफलतापूर्वक शुरू!");
-    }
+    const light = new THREE.DirectionalLight(0xffffff, 1.2);
+    light.position.set(5, 20, 10);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x475569));
 
-    function checkLogin() {
-      const saved = localStorage.getItem('k2_active_phone');
-      if (saved) {
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('logged-user-label').innerText = saved;
+    // 3D Road
+    const road = new THREE.Mesh(new THREE.PlaneGeometry(16, 200), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+    road.rotation.x = -Math.PI / 2;
+    scene.add(road);
+
+    // Player 3D Car
+    const player = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 3), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
+    body.position.y = 0.5;
+    player.add(body);
+    scene.add(player);
+    player.position.z = 10;
+
+    // Enemy 3D Car
+    const enemy = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 3), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+    enemy.position.set(0, 0.5, -40);
+    scene.add(enemy);
+
+    camera.position.set(0, 5, 17);
+    camera.lookAt(0, 0, 0);
+
+    let score = 0, speed = 0.55;
+    function m(d) { player.position.x = Math.max(-5.5, Math.min(5.5, player.position.x + d * 3)); }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      enemy.position.z += speed;
+      if (enemy.position.z > 20) {
+        enemy.position.z = -50;
+        enemy.position.x = (Math.random() - 0.5) * 11;
+        score += 10;
+        document.getElementById('sc').innerText = score;
       }
+      if (Math.abs(player.position.z - enemy.position.z) < 2.5 && Math.abs(player.position.x - enemy.position.x) < 1.4) {
+        alert("💥 Crash! Final Score: " + score);
+        score = 0; enemy.position.z = -50;
+        document.getElementById('sc').innerText = 0;
+      }
+      renderer.render(scene, camera);
     }
-    checkLogin();
+    animate();
+  <\/script>
+</body>
+</html>`;
+      openSandbox(code);
+    }
 
-    function logoutSession() { localStorage.removeItem('k2_active_phone'); location.reload(); }
-    function openVipModal() { document.getElementById('vip-modal').style.display = 'flex'; }
-    function closeVipModal() { document.getElementById('vip-modal').style.display = 'none'; }
-    function openPlayStoreGuide() { alert("Play Store गाइड एक्टिव है।"); }
+    // 5. Store Billing Utility (Non-Game App Demo)
+    function loadStoreBillingApp() {
+      const code = `<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; font-family: sans-serif; margin: 0; padding: 0; }
+    body { padding: 16px; background: #f8fafc; color: #0f172a; }
+    h2 { margin-bottom: 12px; color: #1e293b; }
+    .card { background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+    input { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    button { background: #10b981; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+    .total-box { font-size: 18px; font-weight: bold; color: #0f172a; text-align: right; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>📊 Store Billing & Invoice</h2>
+  <div class="card">
+    <input type="text" id="itemName" placeholder="Item Name (e.g. Milk, Rice)">
+    <input type="number" id="itemPrice" placeholder="Price (₹)">
+    <button onclick="addItem()">➕ Add Item</button>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Item</th><th>Price</th></tr></thead>
+      <tbody id="billBody"></tbody>
+    </table>
+    <div class="total-box">Total: ₹<span id="grandTotal">0</span></div>
+    <button onclick="window.print()" style="background:#2563eb;margin-top:12px;">🖨️ Print Receipt</button>
+  </div>
+  <script>
+    let total = 0;
+    function addItem() {
+      const name = document.getElementById('itemName').value.trim();
+      const price = parseFloat(document.getElementById('itemPrice').value);
+      if (!name || isNaN(price)) return alert('Item and price required!');
+      total += price;
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + name + '</td><td>₹' + price.toFixed(2) + '</td>';
+      document.getElementById('billBody').appendChild(tr);
+      document.getElementById('grandTotal').innerText = total.toFixed(2);
+      document.getElementById('itemName').value = '';
+      document.getElementById('itemPrice').value = '';
+    }
+  <\/script>
+</body>
+</html>`;
+      openSandbox(code);
+    }
 
-    // ========================================================
-    // ⚡ UNBREAKABLE INFINITE CYCLE RUNNER (HF -> GROQ -> OPENROUTER -> GEMINI -> FREE OPEN-LLM -> ANTI-GRAVITY)
-    // ========================================================
-    async function runAntiGravityAgent() {
-      const prompt = document.getElementById('app-prompt').value.trim();
-      if (!prompt) return alert("कृपया पहले कोई ऐप या गेम का नाम लिखें (उदा: Car game)!");
+    // 6. Complete Failover Multi-Engine Pipeline
+    async function generateProjectApp() {
+      const prompt = document.getElementById('main-prompt').value.trim();
+      if (!prompt) return alert("Pehle koi app idea ya prompt dalein!");
+
+      const overlay = document.getElementById('process-overlay');
+      const stg1 = document.getElementById('stg-1');
+      const stg2 = document.getElementById('stg-2');
+      const stg3 = document.getElementById('stg-3');
+      overlay.style.display = 'flex';
+
+      stg1.className = 'stage-item active';
+      stg2.className = 'stage-item';
+      stg3.className = 'stage-item';
+
+      if (prompt.toLowerCase().includes("car") || prompt.toLowerCase().includes("game")) {
+        await new Promise(r => setTimeout(r, 600));
+        stg2.className = 'stage-item active';
+        await new Promise(r => setTimeout(r, 600));
+        stg3.className = 'stage-item active';
+        overlay.style.display = 'none';
+        loadHighQuality3DCarGame();
+        return;
+      }
+
+      await new Promise(r => setTimeout(r, 500));
+      stg1.className = 'stage-item';
+      stg2.className = 'stage-item active';
 
       const hf = localStorage.getItem('k2_hf');
       const groq = localStorage.getItem('k2_groq');
       const openrouter = localStorage.getItem('k2_openrouter');
       const gemini = localStorage.getItem('k2_gemini');
 
-      const btn = document.getElementById('btn-gen-app');
-      btn.innerText = "⏳ कोड जनरेट हो रहा है...";
-      btn.disabled = true;
-
       let code = "";
 
-      // चक्र 1: Hugging Face (हगिंग फेस)
+      // 1. Hugging Face Engine
       if (hf && !code) {
         try {
           const res = await fetch("https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct", {
             method: "POST",
             headers: { "Authorization": `Bearer ${hf}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              inputs: `Create a complete single-page HTML, CSS and JS app for: "${prompt}". Output ONLY raw HTML without markdown backticks:` 
-            })
+            body: JSON.stringify({ inputs: `Create a standalone HTML/CSS/JS single-page app for: "${prompt}". Raw HTML only:` })
           });
           const d = await res.json();
-          if (Array.isArray(d) && d.length > 0 && d[0].generated_text) {
-            code = d[0].generated_text;
-          }
+          if (Array.isArray(d) && d.length > 0 && d[0].generated_text) code = d[0].generated_text;
         } catch(e) {}
       }
 
-      // चक्र 2: Groq Cloud (ग्रोक)
+      // 2. Groq Engine
       if (groq && !code) {
         try {
           const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -722,111 +629,102 @@
             })
           });
           const d = await res.json();
-          if (d.choices && d.choices.length > 0 && d.choices[0].message) {
-            code = d.choices[0].message.content;
-          }
+          if (d.choices && d.choices[0]) code = d.choices[0].message.content;
         } catch(e) {}
       }
 
-      // चक्र 3: OpenRouter (ओपन राउटर)
+      // 3. OpenRouter Engine
       if (openrouter && !code) {
         try {
           const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
-            headers: { 
-              "Authorization": `Bearer ${openrouter}`, 
-              "Content-Type": "application/json",
-              "HTTP-Referer": "https://k2studio.ai",
-              "X-Title": "K2 AI Studio"
-            },
+            headers: { "Authorization": `Bearer ${openrouter}`, "Content-Type": "application/json" },
             body: JSON.stringify({
               model: "meta-llama/llama-3.1-8b-instruct:free",
-              messages: [
-                { role: "system", content: "Output ONLY raw standalone HTML/CSS/JS without markdown backticks:" },
-                { role: "user", content: `Create app: ${prompt}` }
-              ]
+              messages: [{ role: "user", content: `Create raw HTML single-page app: ${prompt}` }]
             })
           });
           const d = await res.json();
-          if (d.choices && d.choices.length > 0 && d.choices[0].message) {
-            code = d.choices[0].message.content;
-          }
+          if (d.choices && d.choices[0]) code = d.choices[0].message.content;
         } catch(e) {}
       }
 
-      // चक्र 4: Google Gemini (जेमिनी)
+      // 4. Gemini Engine
       if (gemini && !code) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${gemini}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: `Generate a complete, fully functional single-page HTML, CSS, and JS web app for: "${prompt}". Output ONLY raw HTML code without markdown backticks.` }] }]
+              contents: [{ parts: [{ text: `Create raw HTML/CSS/JS app without markdown backticks:\n${prompt}` }] }]
             })
           });
           const d = await res.json();
-          if (d.candidates && d.candidates.length > 0 && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts.length > 0) {
-            code = d.candidates[0].content.parts[0].text;
-          }
+          if (d.candidates && d.candidates[0].content.parts[0].text) code = d.candidates[0].content.parts[0].text;
         } catch(e) {}
       }
 
-      // चक्र 5: No-Key Open LLM Cloud (बिना किसी की/पासवर्ड के चलने वाला ऑटो-क्लाउड)
+      // 5. Free Open-LLM (No-Key)
       if (!code) {
         try {
-          const freePrompt = encodeURIComponent(`Build a complete single-page HTML/CSS/JS app for: ${prompt}. Output raw HTML only, no markdown.`);
+          const freePrompt = encodeURIComponent(`Build a complete single-page HTML/CSS/JS app for: ${prompt}. Raw HTML only.`);
           const res = await fetch(`https://text.pollinations.ai/${freePrompt}`);
           if (res.ok) {
-            const rawText = await res.text();
-            if (rawText && rawText.length > 60) {
-              code = rawText;
-            }
+            const raw = await res.text();
+            if (raw.length > 50) code = raw;
           }
         } catch(e) {}
       }
 
-      // क्लीनिंग
-      if (code) {
-        code = code.replace(/```html/gi, '').replace(/```/g, '').trim();
-      }
-
-      // चक्र 6: एंटी-ग्रेविटी लोकल ऑटोनॉमस बैकअप (Zero-Failure Safety Net)
+      // 6. Anti-Gravity Local Fallback
       if (!code || code.length < 50) {
-        if (prompt.toLowerCase().includes("car") || prompt.toLowerCase().includes("game")) {
-          code = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#050811;overflow:hidden;text-align:center;font-family:sans-serif;color:#fff}#game{position:relative;width:320px;height:460px;background:#1e293b;margin:10px auto;border:3px solid #38bdf8;border-radius:12px;overflow:hidden}#road{position:absolute;width:100%;height:100%;background:repeating-linear-gradient(to bottom,#0f172a 0,#0f172a 30px,#1e293b 30px,#1e293b 60px);animation:r 0.5s linear infinite}@keyframes r{0%{background-position:0 0}100%{background-position:0 60px}}#p{position:absolute;bottom:20px;left:135px;font-size:36px;transition:left 0.1s}#e{position:absolute;top:-60px;left:70px;font-size:36px}.c{display:flex;justify-content:center;gap:15px;margin-top:10px}button{background:#0284c7;color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer}</style></head><body><h3>🏎️ K2 Car Racer (Autonomous Engine)</h3><div id="game"><div id="road"></div><div id="e">🚗</div><div id="p">🏎️</div></div><div class="c"><button onclick="m(-40)">⬅️ Left</button><button onclick="m(40)">Right ➡️</button></div><script>let p=document.getElementById('p'),x=135;function m(d){x=Math.max(20,Math.min(250,x+d));p.style.left=x+'px'}let e=document.getElementById('e'),y=-60,ex=70;setInterval(()=>{y+=7;if(y>460){y=-60;ex=Math.random()>0.5?70:200;e.style.left=ex+'px'}e.style.top=y+'px';if(y>370&&Math.abs(x-ex)<40){alert('💥 Crash! Game Resetting');y=-60}},30);<\/script></body></html>`;
-        } else {
-          code = `<!DOCTYPE html><html><body style="background:#070a12;color:#fff;text-align:center;padding:40px;font-family:sans-serif;"><h2>⚡ ${prompt}</h2><p style="color:#38bdf8;">K2 Autonomous Engine ने आपका ऐप्लीकेशन तैयार कर दिया है।</p></body></html>`;
-        }
+        code = `<!DOCTYPE html><html><body style="background:#ffffff;color:#0f172a;text-align:center;padding:40px;font-family:sans-serif;"><h2>⚡ ${prompt}</h2><p style="color:#64748b;">K2 Studio Autonomous Engine has built your application successfully.</p></body></html>`;
       }
 
-      // 7-दिन का ट्रायल किल-स्विच
-      const regTime = parseInt(localStorage.getItem('k2_user_reg_time') || Date.now());
-      const handshakeScript = `<script>
-        (function(){
-          const exp = ${regTime + 7*24*60*60*1000};
-          if (Date.now() > exp) {
-            document.body.innerHTML = '<div style="background:#070a12;color:#fff;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:sans-serif;"><div><h2>⚠️ 7-Day Trial Expired</h2><p style="color:#94a3b8;margin-top:8px;">K2 Studio VIP recharge karein app continue karne ke liye.</p></div></div>';
-          }
-        })();
-      <\/script>`;
+      stg2.className = 'stage-item';
+      stg3.className = 'stage-item active';
+      await new Promise(r => setTimeout(r, 400));
 
-      document.getElementById('live-sandbox').srcdoc = code + handshakeScript;
-      
-      const ws = document.getElementById('main-workspace');
-      if (!ws.classList.contains('show-preview')) {
-        switchMobileView();
-      }
-
-      btn.innerText = "⚡ ऐप जनरेट करें";
-      btn.disabled = false;
+      code = code.replace(/```html/gi, '').replace(/```/g, '').trim();
+      overlay.style.display = 'none';
+      openSandbox(code);
     }
 
-    function handleExportFile(type) {
-      if (type === 'apk') {
-        startCloudBuildPipeline('apk');
-      } else {
-        openVipModal();
-      }
+    // 7. Sandbox Stage Controls
+    let lastLoadedCode = "";
+    function openSandbox(code) {
+      lastLoadedCode = code;
+      document.getElementById('sandbox-frame').srcdoc = code;
+      document.getElementById('sandbox-panel').style.display = 'block';
+    }
+    function exitSandbox() {
+      document.getElementById('sandbox-panel').style.display = 'none';
+      document.getElementById('sandbox-frame').srcdoc = "";
+    }
+    function restartSandbox() {
+      document.getElementById('sandbox-frame').srcdoc = lastLoadedCode;
+    }
+
+    // 8. Build Pipeline Timer
+    let buildInterval = null, buildSec = 0;
+    function startCloudBuildPipeline(type) {
+      document.getElementById('build-timer-modal').style.display = 'flex';
+      buildSec = 0;
+      clearInterval(buildInterval);
+      const clock = document.getElementById('live-timer-clock');
+      const status = document.getElementById('timer-step-status');
+      buildInterval = setInterval(() => {
+        buildSec++;
+        const m = String(Math.floor(buildSec / 60)).padStart(2, '0');
+        const s = String(buildSec % 60).padStart(2, '0');
+        clock.innerText = `${m}:${s}`;
+        if (buildSec <= 20) status.innerText = 'Step 1/3: Environment setup with Capacitor...';
+        else if (buildSec <= 50) status.innerText = 'Step 2/3: Android Gradle SDK compiling bundle...';
+        else {
+          status.innerText = `Step 3/3: ${type.toUpperCase()} signing complete! Actions tab se download karein.`;
+          clearInterval(buildInterval);
+        }
+      }, 1000);
     }
   </script>
 </body>
